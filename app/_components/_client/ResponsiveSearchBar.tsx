@@ -24,38 +24,33 @@ export default function ResponsiveSearchBar() {
       {SearchbarState ? (
         <motion.div
           key="searchbar"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.3 }}
-          className="fixed top-0 left-0 z-[20] w-full bg-thired_dash h-[70px]"
-        >
-          <div className="flex items-center justify-between w-[80%] max-md:w-[95%] h-full mx-auto max-md:gap-2 max-lg:gap-4">
-            <div className="lg:hidden block w-full">
-              <InputSearchData />
-            </div>
-            <div
-              onClick={toggleSearchBar}
-              className="w-6 h-6 flex items-center justify-center bg-thired_dash border border-primary_blue rounded-md cursor-pointer"
-            >
-              <IoMdClose className="size-4 text-primary_blue" />
-            </div>
-          </div>
-        </motion.div>
-      ) : (
-        <motion.div
-          key="searchIcon"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="absolute top-1/2 -translate-y-1/2 right-5 cursor-pointer"
+          transition={{ duration: 0.2 }}
+          className="fixed top-0 left-0 z-[1000] w-full bg-black/95 backdrop-blur-md h-[70px]"
         >
-          <CiSearch
-            onClick={toggleSearchBar}
-            className="lg:size-5 size-7 text-primary_blue"
-          />
+          <div className="flex items-center justify-between w-[80%] max-md:w-[95%] h-full mx-auto gap-3">
+            <div className="w-full">
+              <InputSearchData />
+            </div>
+            <button
+              onClick={toggleSearchBar}
+              className="w-10 h-10 flex items-center justify-center rounded-md bg-[#141414] border border-white/10 cursor-pointer hover:bg-[#1a1a1a] transition-colors shrink-0"
+              aria-label="Close search"
+            >
+              <IoMdClose className="size-5 text-white" />
+            </button>
+          </div>
         </motion.div>
+      ) : (
+        <button
+          onClick={toggleSearchBar}
+          className="w-10 h-10 flex items-center justify-center rounded-full bg-accent/10 text-accent hover:bg-accent/20 transition-colors lg:hidden"
+          aria-label="Open search"
+        >
+          <CiSearch className="size-5" />
+        </button>
       )}
     </AnimatePresence>
   );

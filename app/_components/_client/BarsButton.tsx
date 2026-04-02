@@ -10,14 +10,16 @@ export default function BarsButton() {
     setShowMobail((prev) => !prev);
   };
   return (
-    <>
-      <div onClick={handleToggle} className="">
-        {!showMobail ? (
-          <HiBars3BottomRight className="size-7 text-white rotate-180 xl:hidden block cursor-pointer" />
-        ) : (
-          <IoCloseOutline className="size-8 text-primary_blue rotate-180 xl:hidden block cursor-pointer" />
-        )}
-      </div>
-    </>
+    <button
+      onClick={handleToggle}
+      className="w-10 h-10 flex items-center justify-center xl:hidden cursor-pointer text-white hover:text-accent transition-colors duration-200"
+      aria-label={showMobail ? "Close menu" : "Open menu"}
+    >
+      {!showMobail ? (
+        <HiBars3BottomRight className="size-6" />
+      ) : (
+        <IoCloseOutline className="size-7 text-accent" />
+      )}
+    </button>
   );
 }

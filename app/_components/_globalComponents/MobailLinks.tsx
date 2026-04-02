@@ -13,20 +13,20 @@ export default function MobailLinks() {
     <AnimatePresence>
       {showMobail && (
         <motion.div
-          initial={{ height: 0, opacity: 0 }}
-          animate={{ height: "230px", opacity: 1 }}
-          exit={{ height: 0, opacity: 0 }}
-          transition={{ duration: 0.3, ease: "easeIn" }}
-          className="max-md:w-full w-[80%] max-lg:w-[95%] bg-secondery_dash mx-auto border-b border-gray-300 p-4 "
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+          className="xl:hidden w-full bg-black/95 backdrop-blur-md border-b border-white/5 relative z-[100]"
         >
-          <div className="flex flex-col gap-4">
-            {navLinks.map((item, index) => {
+          <div className="flex flex-col gap-4 px-6 py-5">
+            {navLinks.map((item) => {
               if (item.type === "link") {
                 return (
                   <Link
-                    key={index}
+                    key={item.href}
                     href={item.href}
-                    className="text-lg hover:text-primary_blue text-white duration-300 whitespace-nowrap"
+                    className="text-sm font-medium text-white/70 hover:text-white transition-colors py-2 min-h-[44px] flex items-center"
                   >
                     {item.label}
                   </Link>
@@ -34,21 +34,21 @@ export default function MobailLinks() {
               } else if (item.type === "custom") {
                 return (
                   <Link
-                    key={index}
+                    key={item.href}
                     href={item.href}
-                    className="flex items-center gap-2 text-white cursor-pointer hover:text-primary_blue duration-300 group/show"
+                    className="flex items-center gap-2 text-white/70 text-sm font-medium hover:text-white transition-colors py-2 min-h-[44px]"
                   >
-                    <p className="whitespace-nowrap">{item.label}</p>
-                    <FaCircle className="size-2 text-red-400" />
+                    <span className="whitespace-nowrap">{item.label}</span>
+                    <FaCircle className="size-1.5 text-accent" />
                   </Link>
                 );
-              } else {
-                return null; // للتأكد من عدم حدوث خطأ إن لم يكن النوع معروفًا
               }
+              return null;
             })}
 
-            {/* يجب وضع المكون خارج map بعد انتهائه */}
-            <DotsNavbar />
+            <div className="pt-3 mt-1 w-fit mr-auto border-t border-white/5 flex justify-center">
+              <DotsNavbar />
+            </div>
           </div>
         </motion.div>
       )}

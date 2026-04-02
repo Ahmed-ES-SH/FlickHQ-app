@@ -85,7 +85,7 @@ export const dash_navs = [
 
 // Plans Section
 export const sharedOptions = [
-  "FlixTV Originals",
+  "FlickHQ Originals",
   "Switch plans or cancel anytime",
   "Stream 65+ top Live",
   "TV channels",
@@ -93,7 +93,7 @@ export const sharedOptions = [
 
 // All Plans Section
 export const AllSharedOptions = [
-  { text: "FlixTV Originals", status: [true, true, true] },
+  { text: "FlickHQ Originals", status: [true, true, true] },
   {
     text: "Get unlimited access to the largest streaming library with no ads",
     status: [true, true, true],
@@ -114,7 +114,7 @@ export const AllSharedOptions = [
 
 export const plans = [
   {
-    title: "Reguler",
+    title: "Regular",
     price: 11.99,
     icons: [true, true, false, false],
   },
@@ -132,7 +132,7 @@ export const plans = [
 
 export const plansWithAllOpations = [
   {
-    title: "Reguler",
+    title: "Regular",
     price: 11.99,
     icons: [true, true, true, true, false, false, false],
   },
@@ -489,75 +489,75 @@ export const partners = [
 ];
 
 // about
-const iconStyle = "size-10 text-primary_blue";
+const iconStyle = "size-10 text-accent";
 export const cards = [
   {
     number: "01",
     title: "Choose your Plan",
     content:
-      "It to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining",
+      "Find the perfect experience for your movie nights. From individual streaming to full theater-at-home features, choose the plan that fits your cinematic lifestyle.",
   },
   {
     number: "02",
     title: "Create an account",
     content:
-      "All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first",
+      "Join our global community of film enthusiasts in seconds. Set up your profile, preferences, and start building your ultimate cinematic watchlist today.",
   },
   {
     number: "03",
-    title: "Enjoy FlixTV",
+    title: "Enjoy FlickHQ",
     content:
-      "It to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting",
+      "Dive into an immersive world of 4K entertainment. Experience movies the way they were meant to be seen, with premium quality and personalized discovery.",
   },
 ];
 
 export const FeaturesCards = [
   {
-    title: "Extensive Library",
+    title: "Cinematic Library",
     content:
-      "Access thousands of movies, series, and documentaries across all genres in one place.",
+      "Explore a curated collection of thousands of 4K movies, exclusive series, and award-winning documentaries across every genre imaginable.",
     icon: <TiBook className={`${iconStyle}`} />,
   },
   {
-    title: "Event Tickets",
+    title: "Digital Premieres",
     content:
-      "Buy tickets for exclusive online premieres and virtual events directly from the platform.",
+      "Get front-row access to the latest blockbusters and independent premieres with our digital ticket system for exclusive virtual screenings.",
     icon: <TbTicket className={`${iconStyle}`} />,
   },
   {
-    title: "Interactive Screenings",
+    title: "Interactive Events",
     content:
-      "Join live screenings with real-time chats and polls to engage with other viewers.",
+      "Experience films together with synchronized screenings, live community chats, and real-time polls during exclusive event windows.",
     icon: <PiScreencastBold className={`${iconStyle}`} />,
   },
   {
-    title: "High-Quality Streaming",
+    title: "Lossless Streaming",
     content:
-      "Stream 4K and HDR content smoothly with minimal buffering and crisp audio.",
+      "Witness every detail with HDR10+ and Dolby Atmos support. Our adaptive bitrate technology ensures a seamless 4K experience even on slower connections.",
     icon: <FaStream className={`${iconStyle}`} />,
   },
   {
-    title: "Personalized Recommendations",
+    title: "AI Discovery",
     content:
-      "Get suggestions tailored to your taste using our advanced AI recommendation engine.",
+      "Our sophisticated neural engine learns your cinematic tastes to provide deeply personal recommendations that go beyond simple genre matching.",
     icon: <MdRecommend className={`${iconStyle}`} />,
   },
   {
-    title: "Offline Viewing",
+    title: "Universal Offline",
     content:
-      "Download your favorite content to watch offline anytime, anywhere.",
+      "Take your cinema with you. Download any title in full quality and watch anywhere, from transcontinental flights to remote getaways.",
     icon: <PiDownloadBold className={`${iconStyle}`} />,
   },
   {
-    title: "Parental Controls",
+    title: "Pro Parental Suite",
     content:
-      "Set viewing restrictions and monitor your child's content with our parental tools.",
+      "Create safe spaces for young viewers with granular age-based filtering, usage monitoring, and custom profile restrictions for every family member.",
     icon: <RiParentFill className={`${iconStyle}`} />,
   },
   {
-    title: "Multi-Device Support",
+    title: "Omni-Channel Sync",
     content:
-      "Enjoy seamless streaming on phones, tablets, smart TVs, and desktops.",
+      "Start on your phone, continue on your tablet, and finish on your Smart TV. Your progress and preferences stay perfectly synced across all devices.",
     icon: <MdOutlineDevicesOther className={`${iconStyle}`} />,
   },
 ];

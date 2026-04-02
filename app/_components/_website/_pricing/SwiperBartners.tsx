@@ -8,7 +8,7 @@ import "swiper/css";
 
 export default function SwiperBartners() {
   return (
-    <div className="h-[30vh] w-full mt-20 mb-10 rounded-xl flex items-center justify-center">
+    <div className="w-full mt-16 mb-10 py-8">
       <Swiper
         className=""
         modules={[Autoplay]}

@@ -1,24 +1,16 @@
 "use client";
 import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { toast } from "sonner";
-import { useSignUp } from "@clerk/nextjs";
 import { VscLoading } from "react-icons/vsc";
-import { useRouter } from "next/navigation";
 
 export default function VerifyCode() {
-  const { signUp, isLoaded } = useSignUp();
-  const router = useRouter();
-
   const [loading, setLoading] = useState(false);
   const [values, setValues] = useState<string[]>(Array(6).fill(""));
   const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
 
-  const code = values.join("");
-
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>,
-    index: number
+    index: number,
   ) => {
     const val = e.target.value;
     if (!/^\d*$/.test(val)) return;
@@ -35,7 +27,7 @@ export default function VerifyCode() {
 
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>,
-    index: number
+    index: number,
   ) => {
     if (e.key === "Backspace" && values[index] === "" && index > 0) {
       inputsRef.current[index - 1]?.focus();
@@ -61,42 +53,17 @@ export default function VerifyCode() {
     inputsRef.current[lastIndex]?.focus();
   };
 
-  if (!signUp) return;
-
-  const handleVerify = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!isLoaded) return;
-
-    try {
-      setLoading(true);
-      const completeSignUp = await signUp.attemptEmailAddressVerification({
-        code,
-      });
-
-      if (completeSignUp.status === "complete") {
-        toast.success("User signed up and verified!");
-        setValues(Array(6).fill(""));
-        router.push("/signin");
-      } else {
-        toast.error("Verification incomplete");
-      }
-    } catch (err) {
-      console.error("Verification error:", err);
-      toast.error("Verification error");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
-    <form
-      onSubmit={handleVerify}
-      className="h-fit flex flex-col items-center justify-center bg-slate-900 p-4 rounded-xl space-y-6"
-    >
+    <form className="h-fit flex flex-col items-center justify-center bg-transparent space-y-8 w-full">
+      <div className="text-center space-y-2">
+        <h3 className="text-white text-xl font-bold uppercase tracking-wider">Confirm your email</h3>
+        <p className="text-gray-400 text-sm">We've sent a 6-digit code to your inbox.</p>
+      </div>
+      
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex justify-center gap-3"
+        className="flex justify-center gap-3 w-full"
       >
         {values.map((val, idx) => (
           <input
@@ -109,7 +76,7 @@ export default function VerifyCode() {
             type="text"
             inputMode="numeric"
             maxLength={1}
-            className="w-12 h-12 text-center rounded-lg border-2 border-gray-700 focus:border-secondery-green duration-300 outline-none text-xl font-mono"
+            className="w-12 h-14 text-center rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent duration-300 text-2xl font-black font-mono shadow-inner"
             value={val}
             onChange={(e) => handleChange(e, idx)}
             onKeyDown={(e) => handleKeyDown(e, idx)}
@@ -118,23 +85,34 @@ export default function VerifyCode() {
           />
         ))}
       </motion.div>
+      
       <motion.button
         type="submit"
-        whileHover={{ scale: 1.03 }}
-        whileTap={{ scale: 0.97 }}
-        className="bg-primary_blue hover:bg-blue-600 text-white px-6 py-3 w-full rounded-lg font-semibold flex items-center justify-center gap-2 duration-300"
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        className="relative bg-accent hover:bg-[#ff0a16] text-white px-6 py-4 w-full rounded-xl font-bold uppercase tracking-wider flex items-center justify-center gap-2 duration-300 shadow-lg shadow-accent/20 overflow-hidden group/btn"
       >
+        {/* Shimmer Effect */}
+        <div className="absolute inset-0 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-1000 bg-linear-to-r from-transparent via-white/20 to-transparent" />
+
         {loading ? (
           <motion.div
             animate={{ rotate: "360deg" }}
             transition={{ duration: 0.5, repeat: Infinity }}
           >
-            <VscLoading />
+            <VscLoading className="size-5" />
           </motion.div>
         ) : (
-          <p>Verify Email</p>
+          <p className="relative z-10">Verify Experience</p>
         )}
       </motion.button>
+      
+      <button 
+        type="button" 
+        className="text-gray-500 hover:text-white text-sm font-medium transition-colors duration-300 underline underline-offset-4"
+      >
+        Resend code
+      </button>
     </form>
   );
 }

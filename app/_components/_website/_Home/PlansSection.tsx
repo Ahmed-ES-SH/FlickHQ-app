@@ -5,66 +5,91 @@ import { RxCross1 } from "react-icons/rx";
 
 export default function PlansSection() {
   return (
-    <>
-      <div className="head custom-container my-6 pt-4 border-t border-primary_blue">
-        <h1 className="lg:text-5xl text-2xl font-bold text-white my-2">
+    <section className="custom-container my-12 md:my-16 max-sm:my-8">
+      <div className="mb-10 md:mb-14 max-sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3">
           Select Your Plan
         </h1>
-        <p className="text-white lg:text-xl text-[18px] font-light">
+        <p className="text-gray-400 text-base md:text-lg font-light max-sm:text-sm">
           No hidden fees, equipment rentals, or installation appointments.
         </p>
       </div>
-      <div className="custom-container grid max-md:grid-cols-1 max-xl:grid-cols-2 xl:grid-cols-3 gap-12 items-start">
-        {plans.map((plan, planIndex) => (
-          <div
-            className={`w-full min-h-[480px] max-md:h-fit  flex flex-col justify-between ${
-              planIndex == 1
-                ? "bg-primary_blue xl:-translate-y-8"
-                : "bg-fourth_color"
-            } p-6 rounded-lg shadow-md`}
-            key={planIndex}
-          >
-            <div>
-              <h1 className="text-white text-2xl font-semibold pb-4 border-b border-gray-700 mb-4">
+
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8 items-start">
+        {plans.map((plan, planIndex) => {
+          const isPopular = planIndex === 1;
+          return (
+            <div
+              className={`w-full flex flex-col p-6 md:p-8 rounded-lg border transition-all ${
+                isPopular
+                  ? "bg-accent border-accent md:-translate-y-4"
+                  : "bg-[#0f0f0f] border-white/5"
+              }`}
+              key={plan.title}
+            >
+              {isPopular && (
+                <span className="inline-block self-start text-xs font-semibold text-accent bg-white px-2.5 py-1 rounded-full mb-4">
+                  Most Popular
+                </span>
+              )}
+
+              <h2 className="text-white text-xl md:text-2xl font-semibold mb-6">
                 {plan.title}
-              </h1>
-              <div className="flex flex-col gap-8 max-md:gap-4 pb-4 border-b border-gray-700">
+              </h2>
+
+              <ul className="flex flex-col gap-4 mb-8 pb-6 border-b border-white/10">
                 {sharedOptions.map((option, index) => (
-                  <div
-                    className="flex items-center gap-3 text-white"
-                    key={index}
+                  <li
+                    className="flex items-start gap-3"
+                    key={option}
                   >
                     {plan.icons[index] ? (
-                      <IoCheckmark className="text-green-400" />
+                      <IoCheckmark
+                        className={`size-5 shrink-0 mt-0.5 ${
+                          isPopular ? "text-white" : "text-accent"
+                        }`}
+                      />
                     ) : (
-                      <RxCross1 className="text-red-500" />
+                      <RxCross1 className="size-5 shrink-0 mt-0.5 text-gray-600" />
                     )}
-                    <p className="text-gray-300">{option}</p>
-                  </div>
+                    <span
+                      className={`text-sm leading-snug ${
+                        plan.icons[index]
+                          ? isPopular
+                            ? "text-white/90"
+                            : "text-gray-300"
+                          : "text-gray-600"
+                      }`}
+                    >
+                      {option}
+                    </span>
+                  </li>
                 ))}
-              </div>
-              <div
-                id="price"
-                className="flex items-end text-white mt-6 max-md:mt-3"
-              >
-                <h2 className="text-3xl font-bold">${plan.price}</h2>
-                <span className="text-[14px]">/month</span>
-              </div>
-            </div>
+              </ul>
 
-            <button
-              id="btn"
-              className={`block mt-4 mb-2 w-[80%] max-md:w-[98%] py-4 mx-auto rounded-xl text-center text-white cursor-pointer bg-secondery_dash duration-300 ${
-                planIndex === 1
-                  ? "hover:bg-white hover:text-black"
-                  : "hover:bg-primary_blue"
-              }`}
-            >
-              Select Plan
-            </button>
-          </div>
-        ))}
+              <div className="flex items-baseline gap-1 mb-6">
+                <span className="text-white text-3xl font-bold">
+                  ${plan.price}
+                </span>
+                <span className={`text-sm ${isPopular ? "text-white/70" : "text-gray-500"}`}>
+                  /month
+                </span>
+              </div>
+
+              <button
+                className={`w-full py-3.5 rounded-md text-sm font-medium transition-colors min-h-[44px] ${
+                  isPopular
+                    ? "bg-white text-accent hover:bg-white/90"
+                    : "bg-[#1a1a1a] text-white hover:bg-[#222] border border-white/5"
+                }`}
+                aria-label={`Select ${plan.title} plan`}
+              >
+                Select {plan.title}
+              </button>
+            </div>
+          );
+        })}
       </div>
-    </>
+    </section>
   );
 }

@@ -1,13 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --primary_blue: #2f80ed;
+  --accent: #E50914;
+  --panel_bg: #0b0b0b;
+  --main_bg: #000000;
+  --glass_bg: rgba(20, 20, 20, 0.4);
+  --glass_border: rgba(255, 255, 255, 0.1);
+  --primary_blue: #E50914;
   --secondery: #eaa71c;
-  --primary_dash: #38444f;
+  --primary_dash: #141414;
   --secondery_dash: #1f2937;
-  --thired_dash: #131720;
-  --fourth_color: #151f30;
-  --main_bg: #131720;
+  --thired_dash: #0b0b0b;
+  --fourth_color: #141414;
   --second_text: #94a3b8;
   --light_text: #7d8185;
   --success: #28a745;
@@ -20,6 +24,11 @@
 }
 
 @theme inline {
+  --color-accent: var(--accent);
+  --color-panel_bg: var(--panel_bg);
+  --color-main_bg: var(--main_bg);
+  --color-glass_bg: var(--glass_bg);
+  --color-glass_border: var(--glass_border);
   --color-primary_blue: var(--primary_blue);
   --color-secondery: var(--secondery);
   --color-primary_dash: var(--primary_dash);
@@ -27,7 +36,6 @@
   --color-fourth_color: var(--fourth_color);
   --color-sec-text: var(--sec-text);
   --color-thired_dash: var(--thired_dash);
-  --color-main_bg: var(--main_bg);
   --color-second_text: var(--second_text);
   --color-light_text: var(--light_text);
   --color-success: var(--success);
@@ -36,10 +44,11 @@
   --color-warning: var(--warning);
   --color-info: var(--info);
   --color-purble: var(--purble);
-  --breakpoint-3xl: 1800px;
   --color-secondary: var(--secondary);
   --animate-wiggle: wiggle 1s ease-in-out infinite;
   --breakpoint-3xl: 1680px;
+  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-newsreader), ui-serif, Georgia, serif;
 }
 
 ::-webkit-scrollbar {
@@ -47,7 +56,8 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #3498db;
+  background-color: var(--accent);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-track {
@@ -58,6 +68,23 @@
 @layer components {
   .custom-container {
     @apply xl:w-[80%] lg:w-[95%] w-[95%] mx-auto p-4 max-md:p-2;
+  }
+  
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+  
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .text-balance {
+    text-wrap: balance;
   }
 }
 

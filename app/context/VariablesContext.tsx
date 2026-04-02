@@ -16,7 +16,7 @@ export default function VaribalesProvider({ children }: Props) {
   const [showSidebar, setShowSidebar] = useState<boolean>(true);
   const [trailerState, setTrailerState] = useState(false);
   const [trendingState, setTrendingState] = useState<"movies" | "shows">(
-    "movies"
+    "shows",
   );
   const [SearchbarState, setSearchbarState] = useState<boolean>(false);
   const [currentCategory, setCurrentCategory] = useState<

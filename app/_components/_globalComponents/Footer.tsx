@@ -1,9 +1,4 @@
 "use client";
-import {
-  opation_about,
-  opation_press,
-  opation_shop,
-} from "@/app/constants/website";
 import { usePathname } from "next/navigation";
 import {
   FaInstagram,
@@ -13,68 +8,84 @@ import {
 } from "react-icons/fa";
 import Img from "./Img";
 
-const sections = [
-  { title: "Shop", items: opation_shop },
-  { title: "Press", items: opation_press },
-  { title: "About", items: opation_about },
-];
+
 
 export default function Footer() {
   const pathname = usePathname();
-  if (pathname == "/dashboard") return null;
+  if (pathname === "/dashboard") return null;
+
+  const discoveryItems = ["Trending Movies", "Top Rated Shows", "New Releases", "Upcoming Premieres", "Original Productions"];
+  const communityItems = ["Help Center", "Community Forum", "Cinematic Blog", "Device Support", "Accessibility"];
+  const companyItems = ["About FlickHQ", "Press Media", "Careers", "Legal Notices", "Contact Us"];
+
+  const footerSections = [
+    { title: "Discovery", items: discoveryItems },
+    { title: "Community", items: communityItems },
+    { title: "Company", items: companyItems },
+  ];
+
   return (
-    <footer className="bg-secondery_dash p-3">
-      <div className="m-auto w-[90%] grid grid-cols-4 max-md:grid-cols-2 border-b border-gray-400 gap-4">
-        <div className="h-fit w-3/4">
-          <Img
-            className="border-b w-40 border-gray-400 mb-2"
-            src="/website/logo.svg"
-            alt="logo"
-          />
-          <p className="text-white text-sm">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit officiis
-            corporis optio natus.
+    <footer className="relative bg-[#050505] pt-24 pb-12 overflow-hidden border-t border-white/5">
+      {/* Background Decorative Text */}
+      <div className="absolute top-0 right-0 left-0 flex justify-center opacity-[0.02] pointer-events-none select-none">
+        <h1 className="text-[20vw] font-black tracking-tighter leading-none translate-y-[-20%]">FLICKHQ</h1>
+      </div>
+
+      <div className="custom-container relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-16 mb-20">
+          {/* Brand Section - Takes 2 columns */}
+          <div className="lg:col-span-2 space-y-8">
+            <div className="space-y-4">
+              <Img
+                className="w-32 brightness-110 drop-shadow-[0_0_20px_rgba(229,9,20,0.4)]"
+                src="/logo.webp"
+                alt="FlickHQ Logo"
+              />
+              <p className="text-white/50 text-sm leading-relaxed max-w-sm font-medium">
+                The ultimate gateway to cinematic discovery. Explore thousands of 4K titles, exclusive premieres, and award-winning originals designed for the modern enthusiast.
+              </p>
+            </div>
+            
+            <div className="flex gap-5 text-xl text-white/40">
+              <FaInstagram className="hover:text-accent hover:-translate-y-1 transition-all duration-500 cursor-pointer" />
+              <FaTwitter className="hover:text-accent hover:-translate-y-1 transition-all duration-500 cursor-pointer" />
+              <FaFacebook className="hover:text-accent hover:-translate-y-1 transition-all duration-500 cursor-pointer" />
+              <FaPinterestP className="hover:text-accent hover:-translate-y-1 transition-all duration-500 cursor-pointer" />
+            </div>
+          </div>
+
+          {/* Links Sections */}
+          {footerSections.map((section) => (
+            <div key={section.title} className="space-y-6">
+              <h4 className="text-white text-xs font-black tracking-[0.3em] uppercase">
+                {section.title}
+              </h4>
+              <ul className="space-y-4">
+                {section.items.map((item) => (
+                  <li
+                    key={item}
+                    className="text-white/40 text-sm hover:text-accent hover:translate-x-2 transition-all duration-500 cursor-pointer font-medium"
+                  >
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex flex-wrap justify-center md:justify-start gap-8">
+            <span className="text-[10px] font-black tracking-[0.2em] uppercase text-white/20 hover:text-white/60 cursor-pointer transition-colors">Privacy Policy</span>
+            <span className="text-[10px] font-black tracking-[0.2em] uppercase text-white/20 hover:text-white/60 cursor-pointer transition-colors">Terms of Service</span>
+            <span className="text-[10px] font-black tracking-[0.2em] uppercase text-white/20 hover:text-white/60 cursor-pointer transition-colors">Cookie Settings</span>
+          </div>
+          
+          <p className="text-[10px] font-black tracking-[0.2em] uppercase text-white/20">
+            © {new Date().getFullYear()} FLICKHQ. ALL RIGHTS RESERVED.
           </p>
         </div>
-
-        {sections.map((section) => (
-          <div key={section.title} className="text-gray-400">
-            <h1 className="text-white text-lg py-2">{section.title}</h1>
-            <ul>
-              {section.items.map((item) => (
-                <li
-                  key={item}
-                  className="p-1 hover:ml-2 hover:text-primary_blue duration-300 cursor-pointer"
-                >
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-
-      <div className="text-white text-base pt-4 w-[90%]  mx-auto flex items-center justify-between max-md:flex-col max-sm:items-start max-md:gap-8 gap-4">
-        <div className="flex items-center flex-wrap gap-3 flex-1/2 max-md:w-fit">
-          <p className="border-r border-gray-400 p-2 ">Privacy Policy</p>
-          <p className="border-r border-gray-400 p-2 ">Terms & Conditions</p>
-          <p className=" ">Code of Conduct</p>
-        </div>
-
-        <div className="flex gap-4 text-xl">
-          <FaInstagram className="hover:-translate-y-2 duration-300 cursor-pointer" />
-          <FaFacebook className="hover:-translate-y-2 duration-300 cursor-pointer" />
-          <FaTwitter className="hover:-translate-y-2 duration-300 cursor-pointer" />
-          <FaPinterestP className="hover:-translate-y-2 duration-300 cursor-pointer" />
-        </div>
-      </div>
-
-      <div className="w-[90%] m-auto text-white pt-4">
-        <p className="w-1/2 max-md:w-full text-sm">
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptate,
-          fuga. Ex at maxime eum odio quibusdam pariatur expedita explicabo
-          harum! Consectetur ducimus delectus nemo, totam odit!
-        </p>
       </div>
     </footer>
   );

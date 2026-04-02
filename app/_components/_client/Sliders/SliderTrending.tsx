@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 import { Swiper as SwiperType } from "swiper";
 import { ShowType } from "@/app/types/websiteTypes";
 import { Virtual, Autoplay } from "swiper/modules";
@@ -10,58 +10,47 @@ import "swiper/css";
 
 interface props {
   data: ShowType[];
-  setCurrent: React.Dispatch<React.SetStateAction<number | null>>;
 }
 
-export default function SliderTrending({ data, setCurrent }: props) {
+export default function SliderTrending({ data }: props) {
   const swiperRef = useRef<SwiperType | null>(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [movieId, setMovieId] = useState<number | null>(null);
   const { genres } = useData();
 
-  const handleCurrentSlide = (id: number) => {
-    setMovieId(id);
+  const handleCurrentSlide = () => {
+    // Optional: implement navigate to detail page or open modal
   };
 
-  useEffect(() => {
-    if (movieId !== null) {
-      setCurrent(movieId);
-    } else {
-      setCurrent(currentIndex);
-    }
-  }, [currentIndex, movieId, setCurrent]);
-
   return (
-    <div className="w-1/4 max-xl:w-full max-lg:h-[35vh] lg:h-[45vh]  xl:h-full max-xl:p-2 overflow-hidden">
+    <div className="w-full xl:pl-16 lg:pl-12 pl-6 custom-container-overflow-hidden">
       <Swiper
-        className="w-full h-full "
+        className="w-full h-full overflow-visible"
         modules={[Virtual, Autoplay]}
         autoplay={{
           delay: 4500,
           pauseOnMouseEnter: true,
         }}
-        slidesPerView={3}
+        slidesPerView={4.2}
         onSwiper={(swiper) => (swiperRef.current = swiper)}
-        onSlideChange={(swiper) => setCurrentIndex(swiper.activeIndex)}
         breakpoints={{
           0: {
-            slidesPerView: 1,
-            spaceBetween: 0,
+            slidesPerView: 1.2,
+            spaceBetween: 16,
           },
           300: {
-            slidesPerView: 2,
-            spaceBetween: 20,
+            slidesPerView: 2.2,
+            spaceBetween: 16,
           },
           620: {
-            slidesPerView: 3,
-            spaceBetween: 30,
+            slidesPerView: 3.2,
+            spaceBetween: 20,
           },
-          640: {
-            slidesPerView: 4,
-            spaceBetween: 30,
+          960: {
+            slidesPerView: 4.2,
+            spaceBetween: 24,
           },
           1280: {
-            slidesPerView: 1,
+            slidesPerView: 5.5,
+            spaceBetween: 24,
           },
         }}
       >
@@ -77,7 +66,7 @@ export default function SliderTrending({ data, setCurrent }: props) {
               className="rounded-md w-full  my-auto"
               key={movie.id}
               virtualIndex={index}
-              onClick={() => handleCurrentSlide(movie.id)}
+              onClick={() => handleCurrentSlide()}
             >
               <SliderCard
                 height="h-full"

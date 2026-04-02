@@ -83,7 +83,7 @@ export default function Contactus() {
             <div className="flex items-center gap-2 mt-2">
               <MdEmail className="text-primary_blue size-6 lg:size-8" />
               <p className="cursor-pointer hover:text-primary_blue duration-300 lg:text-xl text-lg text-white  ">
-                support@flixtv.template
+                support@FlickHQ.template
               </p>
             </div>
             {/* Social Icons  */}
