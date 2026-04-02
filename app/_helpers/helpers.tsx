@@ -4,7 +4,7 @@ export const formatTitle = (title: string) =>
 // دالة لإعادة البيانات المشتركة
 export const getSharedMetadata = (title: string, description: string) => ({
   keywords: [
-    "FLIXTV",
+    "FlickHQ",
     "Watch Movies Online",
     "Stream TV Shows",
     "Latest Series",
@@ -16,14 +16,14 @@ export const getSharedMetadata = (title: string, description: string) => ({
   openGraph: {
     title: title,
     description: description,
-    url: `https://www.flixtv.com`, // يُعدّل حسب البنية الفعلية للموقع
-    siteName: "FLIXTV",
+    url: `https://www.FlickHQ.com`, // يُعدّل حسب البنية الفعلية للموقع
+    siteName: "FlickHQ",
     images: [
       {
-        url: "https://www.flixtv.com/images/og-image.jpg", // استبدل بالرابط الصحيح
+        url: "https://www.FlickHQ.com/images/og-image.jpg", // استبدل بالرابط الصحيح
         width: 1200,
         height: 630,
-        alt: "FLIXTV - Stream Movies and Shows Online",
+        alt: "FlickHQ - Stream Movies and Shows Online",
       },
     ],
     type: "website",
@@ -32,13 +32,13 @@ export const getSharedMetadata = (title: string, description: string) => ({
     card: "summary_large_image",
     title: title,
     description: description,
-    image: "https://www.flixtv.com/images/twitter-image.jpg", // استبدل بالرابط الصحيح
+    image: "https://www.FlickHQ.com/images/twitter-image.jpg", // استبدل بالرابط الصحيح
   },
 });
 
 export const formatDateTime = (
   date: string | number,
-  time: string | number
+  time: string | number,
 ) => {
   // إذا كان date عدد (timestamp)
   const isTimestamp = typeof date === "number" || typeof time === "number";

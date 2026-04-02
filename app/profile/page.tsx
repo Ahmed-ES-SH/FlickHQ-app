@@ -1,12 +1,10 @@
 "use client";
 import Img from "@/app/_components/_globalComponents/Img";
-import { useUser } from "@clerk/nextjs";
 import { motion } from "framer-motion";
 import { FaEnvelope, FaCalendarAlt, FaSignInAlt, FaUser } from "react-icons/fa";
 
 export default function ProfileCard() {
-  const { user } = useUser();
-
+  const user = null;
   if (!user) return;
 
   return (

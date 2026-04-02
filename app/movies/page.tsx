@@ -1,50 +1,64 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from "react";
-import { genersMovies, PopularMovies } from "../constants/apis";
-import MediaCard from "../_components/_website/_movies/MediaCard";
-import { gener } from "../types/ContextType";
-import { ShowType } from "../types/websiteTypes";
+import React, { Suspense } from "react";
+import { genersMovies } from "../constants/apis";
+import MoviesGrid from "../_components/_website/_movies/MoviesGrid";
 import ServerPagination from "../_components/_globalComponents/ServerPagination";
 import FetchData from "../hooks/FetchData";
+import MoviesPageHeader from "../_components/_website/_movies/MoviesPageHeader";
+import CategoryTabs from "../_components/_website/_movies/CategoryTabs";
+import GenreSidebar from "../_components/_website/_movies/GenreSidebar";
 
 export default async function page({ searchParams }: any) {
   const { genres } = await FetchData(genersMovies, false);
-  const currentPage = Number(searchParams?.page || 1);
+  const params = await searchParams; // Next.js 15 requires awaiting searchParams
+  const currentPage = Number(params?.page || 1);
+  const currentCategory = params?.category || "popular";
+  const currentGenre = params?.genre;
 
-  const { data, total_pages } = await FetchData(
-    `${PopularMovies}page=${currentPage}`,
-    true
-  );
+  // Determine endpoint based on category and genre
+  let endpoint = `/movie/${currentCategory}?language=en-US&page=${currentPage}`;
+
+  if (currentGenre) {
+    let sortBy = "popularity.desc";
+    if (currentCategory === "top_rated") sortBy = "vote_average.desc";
+    if (currentCategory === "upcoming") sortBy = "primary_release_date.desc";
+    if (currentCategory === "now_playing") sortBy = "release_date.desc";
+
+    endpoint = `/discover/movie?language=en-US&sort_by=${sortBy}&with_genres=${currentGenre}&page=${currentPage}`;
+  }
+
+  const { data, total_pages } = await FetchData(endpoint, true);
+  const firstMovieBackdrop = data?.results?.[0]?.backdrop_path || null;
 
   return (
     <>
-      <div className="w-[95%] max-md:w-full max-md:p-2 mb-3 mx-auto mt-20">
-        <div className="w-full  grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4  min-[1700px]:grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-4 xl:gap-5">
-          {data &&
-            data.results.length > 0 &&
-            data.results.map((show: ShowType, index: number) => {
-              const matchedGenres =
-                genres &&
-                genres.filter((genre: gener) =>
-                  show.genre_ids.includes(genre.id as number)
-                );
+      <MoviesPageHeader backdropPath={firstMovieBackdrop} />
 
-              return (
-                <MediaCard
-                  index={index}
-                  key={index}
-                  media={show}
-                  genres={matchedGenres}
-                />
-              );
-            })}
+      <Suspense fallback={<div className="h-10"></div>}>
+        <CategoryTabs />
+      </Suspense>
+
+      <div className="p-2 2xl:w-[94%] mx-auto mb-12 mt-6 flex flex-col lg:flex-row gap-8 lg:gap-10">
+        {/* Sidebar for Genres */}
+        <div className="w-full lg:w-64 shrink-0">
+          <Suspense fallback={<div className="h-10"></div>}>
+            <GenreSidebar genres={genres || []} />
+          </Suspense>
         </div>
 
-        <ServerPagination
-          usedURL="/movies"
-          currentPage={currentPage}
-          totalPages={total_pages >= 500 ? 500 : total_pages}
-        />
+        {/* Main Content */}
+        <div className="flex-1 w-full overflow-hidden">
+          <MoviesGrid movies={data?.results || []} genres={genres || []} />
+
+          {total_pages > 1 && (
+            <ServerPagination
+              usedURL="/movies"
+              searchParams={params}
+              currentPage={currentPage}
+              totalPages={total_pages >= 500 ? 500 : total_pages}
+            />
+          )}
+        </div>
       </div>
     </>
   );

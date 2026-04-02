@@ -1,41 +1,17 @@
 "use client";
-import { UserButton, useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import React from "react";
 import { PiSignIn } from "react-icons/pi";
 
 export default function Signinbtn() {
-  const { user } = useUser();
   return (
-    <>
-      {user ? (
-        <UserButton
-          appearance={{
-            elements: {
-              userButtonAvatarBox: {
-                width: "32px",
-                height: "32px",
-              },
-              userButtonPopoverCard: {
-                zIndex: "999999",
-                marginTop: "15px",
-                marginLeft: "auto",
-              },
-            },
-          }}
-        />
-      ) : (
-        <Link
-          href={"/signin"}
-          className="flex items-center gap-2 group"
-          aria-label="Go to sign in page"
-        >
-          <h4 className="group-hover:text-primary_blue max-sm:hidden text-white duration-300 whitespace-nowrap">
-            Sign in
-          </h4>
-          <PiSignIn className="w-6 h-6 text-primary_blue group-hover:text-green-500 duration-300" />
-        </Link>
-      )}
-    </>
+    <Link
+      href={"/signin"}
+      className="flex items-center gap-2 bg-accent px-5 py-2 rounded-md text-white text-sm font-medium hover:bg-accent/90 transition-colors active:scale-[0.98]"
+      aria-label="Go to sign in page"
+    >
+      <PiSignIn className="w-4 h-4" />
+      <span className="max-sm:hidden whitespace-nowrap">Sign in</span>
+    </Link>
   );
 }

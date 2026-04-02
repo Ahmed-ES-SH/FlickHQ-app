@@ -1,0 +1,15 @@
+# Design Context
+
+### Users
+Targets movie enthusiasts and recruiters/clients evaluating developer skills. The context is casual browsing for entertainment while experiencing a technical portfolio.
+
+### Brand Personality
+Premium, Modern, Fluid. Designed to evoke a cinematic, immersive, and high-end theatrical feeling.
+
+### Aesthetic Direction
+Glassmorphism & Minimalism. Deep blacks/charcoals (#000000 or #0b0b0b) strictly in dark mode, contrasted with Netflix Red (#E50914) as the vibrant accent color for calls to action. References Streamvid (Home 4) with full-width Hero sections, seamless gradients, organized content carousels, bold typography, high-quality TMDB imagery, and rounded corners. Explicitly avoids cluttered layouts, bright/distracting backgrounds, and sharp/dated UI corners.
+
+### Design Principles
+1. **Immersive Cinematic Experience**: Prioritize high-quality, large imagery from TMDB with seamless gradients.
+2. **Premium Fluidity**: Ensure smooth transitions, organized carousel interactions, and modern glassmorphism effects.
+3. **Focused Minimalism**: Eliminate clutter. Use strict deep dark backgrounds with one distinct, vibrant accent color for CTAs.

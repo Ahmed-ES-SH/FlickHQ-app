@@ -22,11 +22,11 @@ const DataProvider = ({ children }: Props) => {
 
   const { data: moviesGenres } = useFetchData<{ genres: gener[] }>(
     genersMovies,
-    false
+    false,
   );
   const { data: showsGenres } = useFetchData<{ genres: gener[] }>(
     genresShows,
-    false
+    false,
   );
 
   useEffect(() => {

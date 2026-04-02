@@ -16,7 +16,7 @@ interface props {
 export default function SliderCard({
   movie,
   genres,
-  height = "h-[500px]",
+  height = "h-[450px]", // slightly shorter for the cinematic 16:9 feel
 }: props) {
   const [isTouched, setIsTouched] = useState(false);
 
@@ -28,69 +28,66 @@ export default function SliderCard({
     <div
       onTouchStart={() => setIsTouched(true)}
       onMouseLeave={() => setIsTouched(false)}
-      className={`w-full relative cursor-pointer group overflow-hidden ${height}`}
+      className={`w-full relative cursor-pointer group overflow-hidden ${height} rounded-xl border border-glass_border transition-transform active:scale-95 shadow-lg`}
     >
       <Img
         src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-        className="absolute top-0 left-0 w-full h-full object-cover"
+        className="absolute top-0 left-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
       />
 
-      {/* غطاء شفاف */}
+      {/* Fade-in Cinematic Gradient Overlay */}
       <div
-        className={`h-full overflow-hidden duration-500 absolute top-0 left-0 bg-black/60 ${
-          isTouched ? "w-full" : "w-0 group-hover:w-full"
+        className={`h-full w-full duration-500 absolute top-0 left-0 bg-gradient-to-t from-black via-black/40 to-transparent transition-opacity ${
+          isTouched ? "opacity-100" : "opacity-0 group-hover:opacity-100"
         }`}
       ></div>
 
-      {/* التقييم والقلب */}
+      {/* Top Details (Rating & Heart) */}
       <div
-        className={`xl:flex items-center justify-between w-full absolute left-1/2 -translate-x-1/2 duration-700 p-3 flex ${
-          isTouched ? "top-2" : "-top-40 group-hover:top-2"
+        className={`flex items-center justify-between w-full absolute left-0 px-4 duration-500 transition-all ${
+          isTouched ? "top-4 opacity-100" : "-top-10 opacity-0 group-hover:top-4 group-hover:opacity-100"
         }`}
       >
-        <div className="flex items-center gap-1 xl:p-[7px] p-[5px] bg-thired_dash rounded-md">
-          <MdOutlineStarBorderPurple500 className="xl:size-6 size-4 text-secondery-green" />
-          <p className="xl:text-[16px] text-[12px] text-white">
-            {Number(movie.vote_average).toFixed(2)}
+        <div className="flex items-center gap-1 p-[6px] px-2 bg-glass_bg backdrop-blur-md rounded-md border border-glass_border">
+          <MdOutlineStarBorderPurple500 className="size-4 text-accent" />
+          <p className="text-[14px] font-semibold text-white">
+            {Number(movie.vote_average).toFixed(1)}
           </p>
         </div>
-        <div className="flex items-center justify-center xl:w-10 xl:h-10 w-7 h-7 gap-1 p-[6px] bg-thired_dash rounded-md cursor-pointer group/heart">
-          <FaHeart className="text-white group-hover/heart:text-red-400 duration-300 max-lg:size-4" />
+        <div className="flex items-center justify-center size-8 p-[6px] bg-glass_bg backdrop-blur-md rounded-md border border-glass_border cursor-pointer group/heart">
+          <FaHeart className="text-white group-hover/heart:text-accent duration-300 size-4" />
         </div>
       </div>
 
-      {/* الأنواع */}
+      {/* Genres (Glassmorphism tags) */}
       <div
-        className={`flex flex-col items-start absolute duration-700 gap-3 ${
+        className={`flex flex-col items-start absolute duration-700 gap-2 transition-all ${
           isTouched
-            ? "left-0 top-1/2 -translate-y-1/2"
-            : "group-hover:left-0 group-hover:top-1/2 top-0 -left-[80%] -translate-y-1/2"
+            ? "left-0 top-1/2 -translate-y-1/2 opacity-100"
+            : "-left-10 opacity-0 top-1/2 -translate-y-1/2 group-hover:left-0 group-hover:opacity-100"
         }`}
       >
         {genres &&
           genres.slice(0, 3).map((genre, index) => (
             <div
               key={index}
-              className="xl:py-2 xl:px-4 p-1 text-[14px] xl:text-[17px] bg-secondery-green text-gray-200 rounded-r-md hover:bg-white hover:text-black duration-200 cursor-pointer"
+              className="py-1 px-3 text-[13px] bg-glass_bg backdrop-blur-md border border-y-glass_border border-r-glass_border border-l-transparent text-gray-200 rounded-r-md hover:bg-white hover:text-black duration-200 cursor-pointer shadow-sm"
             >
               {genre?.name}
             </div>
           ))}
       </div>
 
-      {/* العنوان وسنة الإصدار */}
+      {/* Bottom Details (Title & Year) */}
       <div
-        className={`flex flex-col gap-2 items-center justify-center w-fit mx-auto absolute left-1/2 -translate-x-1/2 duration-700 ${
-          isTouched ? "bottom-[12%]" : "-bottom-[20%] group-hover:bottom-[12%]"
+        className={`flex flex-col gap-1 items-start w-full absolute px-4 duration-500 transition-all ${
+          isTouched ? "bottom-6 opacity-100" : "-bottom-10 opacity-0 group-hover:bottom-6 group-hover:opacity-100"
         }`}
       >
-        <h2 className="xl:text-xl text-[17px] text-gray-200 whitespace-nowrap hover:text-sky-400 duration-200">
-          {movie &&
-            ((movie.title || movie.name)?.length > 15
-              ? (movie.title || movie.name)?.slice(0, 15) + "..."
-              : movie.title || movie.name)}
+        <h2 className="text-[18px] md:text-xl font-bold text-white line-clamp-1 drop-shadow-md">
+          {movie.title || movie.name}
         </h2>
-        <p className="text-[14px] text-orange-400 font-bold">{MovieYear}</p>
+        <p className="text-[14px] text-gray-300 font-medium">{MovieYear}</p>
       </div>
     </div>
   );

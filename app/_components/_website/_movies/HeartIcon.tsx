@@ -12,12 +12,16 @@ export default function HeartIcon({ media }: props) {
   const { setFavoritesList, handleAddMedia } = useList();
   return (
     <>
-      <div
-        onClick={() => handleAddMedia(setFavoritesList, media)}
-        className="flex items-center justify-center w-10 h-10 gap-1 p-[6px] bg-thired_dash rounded-md cursor-pointer group/heart"
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          handleAddMedia(setFavoritesList, media);
+        }}
+        className="flex items-center justify-center w-11 h-11 bg-black/40 backdrop-blur-md border border-white/10 hover:border-accent/50 hover:bg-accent/20 rounded-xl cursor-pointer group/heart transition-all duration-300 shadow-xl"
+        aria-label="Add to favorites"
       >
-        <FaHeart className="size-5 text-white group-hover/heart:text-red-400 duration-300" />
-      </div>
+        <FaHeart className="size-5 text-gray-300 group-hover/heart:text-accent transition-transform duration-300 group-active/heart:scale-90" />
+      </button>
     </>
   );
 }

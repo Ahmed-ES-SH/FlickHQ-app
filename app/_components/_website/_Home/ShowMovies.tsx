@@ -1,5 +1,6 @@
 "use client";
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState, useRef } from "react";
+import { motion } from "framer-motion";
 import Pagination from "../../_globalComponents/Pagination";
 import { ShowType } from "@/app/types/websiteTypes";
 import {
@@ -12,7 +13,6 @@ import { gener } from "@/app/types/ContextType";
 import { useVariables } from "@/app/context/VariablesContext";
 import MediaCard from "../_movies/MediaCard";
 import { useFetchData } from "@/app/hooks/FetchClientData";
-import "../../../Css/loader.css";
 
 interface DataType {
   results: ShowType[];
@@ -26,9 +26,10 @@ export default function ShowMovies() {
   const [currentApi, setCurrentApi] = useState<string>(
     `${PopularMovies}page=1`
   );
+  const sectionRef = useRef<HTMLDivElement>(null);
 
   // Fetch The Data
-  const { data, isLoading, error } = useFetchData<DataType>(currentApi, true);
+  const { data, isLoading, error } = useFetchData<DataType>(currentApi);
 
   const totalPages = data && data.total_pages;
 
@@ -36,7 +37,7 @@ export default function ShowMovies() {
     // Set API and reset page when category changes
     switch (currentCategory) {
       case "Popular":
-        setCurrentApi(`${PopularMovies}page=1`); // Set to page 1 initially
+        setCurrentApi(`${PopularMovies}page=1`);
         break;
       case "now_playing":
         setCurrentApi(`${nowPlaying}page=1`);
@@ -47,37 +48,59 @@ export default function ShowMovies() {
       default:
         setCurrentApi(`${PopularMovies}page=1`);
     }
-    setCurrentPage(1); // Reset page to 1 whenever category changes
-  }, [currentCategory]); // Only trigger on category change
+    setCurrentPage(1);
+  }, [currentCategory]);
 
   // Whenever the page changes, update the API with the new page
   useEffect(() => {
-    // Scroll behavior when changing pages
-    if (currentPage !== 1) {
-      window.scrollTo({
-        top: 800,
-        left: 0,
-        behavior: "smooth",
-      });
+    if (currentPage !== 1 && sectionRef.current) {
+      sectionRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
     const apiWithPage = `${currentApi.split("page=")[0]}page=${currentPage}`;
     setCurrentApi(apiWithPage);
-  }, [currentApi, currentPage]); // Trigger when currentPage changes
+  }, [currentApi, currentPage]);
 
-  // Show The Error In Console
-
-  if (error) console.log(error);
+  if (error)
+    return (
+      <div className="custom-container flex flex-col items-center justify-center min-h-[50vh] gap-4 p-6">
+        <p className="text-xl max-sm:text-lg font-semibold text-gray-400 text-center">Couldn't load movies</p>
+        <p className="text-sm max-sm:text-base text-gray-600 text-center">Something went wrong. Please try again.</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-6 py-3 max-sm:w-full bg-accent text-white rounded-md font-medium hover:bg-accent/90 transition-colors min-h-[44px]"
+        >
+          Retry
+        </button>
+      </div>
+    );
 
   if (isLoading)
     return (
-      <div className="w-full h-screen fixed top-0 left-0 z-[99] bg-thired_dash flex items-center justify-center">
-        <span className="loader"></span>
+      <div className="custom-container grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 min-[2000px]:grid-cols-6 gap-6 min-h-[50vh]">
+        {[...Array(10)].map((_, i) => (
+          <div
+            key={i}
+            className="w-full aspect-[2/3.5] rounded-2xl bg-white/[0.02] border border-white/5 overflow-hidden animate-pulse"
+          >
+            <div className="w-full aspect-[2/3] bg-white/[0.03]" />
+            <div className="p-4 space-y-3">
+              <div className="h-4 bg-white/[0.03] rounded-lg w-3/4" />
+              <div className="h-3 bg-white/[0.03] rounded-lg w-1/4" />
+            </div>
+          </div>
+        ))}
       </div>
     );
 
   return (
-    <>
-      <div className="custom-container grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4  min-[1700px]:grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-4">
+    <motion.div 
+      ref={sectionRef}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className="pb-20"
+    >
+      <div className="custom-container grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 min-[2000px]:grid-cols-6 gap-6">
         {data &&
           data.results.map((media: ShowType, index: number) => {
             const matchedGenres =
@@ -104,6 +127,6 @@ export default function ShowMovies() {
           setCurrentPage={setCurrentPage as Dispatch<SetStateAction<number>>}
         />
       </div>
-    </>
+    </motion.div>
   );
 }

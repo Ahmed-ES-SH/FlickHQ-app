@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import CurrentMediaDetailes from "@/app/_components/_client/mediaPage/CurrentMediaDetailes";
 import MediaCommentsAndReviews from "@/app/_components/_client/movies/MediaCommentsAndReviews";
-import SliderTopRated from "@/app/_components/_website/_Home/SliderTopRated";
+import Img from "@/app/_components/_globalComponents/Img";
 import MediaTrailer from "@/app/_components/_website/_movies/MediaTrailer";
 import { upcomingMovies } from "@/app/constants/apis";
 import FetchData from "@/app/hooks/FetchData";
@@ -10,25 +10,31 @@ import React from "react";
 
 export default async function page({ searchParams }: any) {
   //movieId
-  const movieId = searchParams?.currentId;
+  const params = await searchParams;
+  const movieId = params?.currentId;
 
   // CurrentMovie
   const movie: ShowType = await FetchData(
     `/movie/${movieId}?language=en-US`,
-    false
+    false,
   );
 
   //similarMovies
   const { results: similarMovies } = await FetchData(
     `/movie/${movieId}/similar`,
-    false
+    false,
   );
 
   // upComingMovies
-
   const { results: upComingMovies } = await FetchData(
     `${upcomingMovies}page=1`,
-    false
+    false,
+  );
+
+  // Top Rated for Sidebar
+  const { results: topRatedForSidebar } = await FetchData(
+    `/movie/top_rated?language=en-US&page=1`,
+    false,
   );
 
   // Movie Trailer
@@ -37,37 +43,50 @@ export default async function page({ searchParams }: any) {
     results.find(
       (item: ShowType) =>
         item.name.toLowerCase().includes("official") &&
-        item.name.toLowerCase().includes("trailer")
+        item.name.toLowerCase().includes("trailer"),
     ) ||
     results.find((item: ShowType) =>
       ["official", "trailer"].some((keyword) =>
-        item.name.toLowerCase().includes(keyword)
-      )
+        item.name.toLowerCase().includes(keyword),
+      ),
     );
 
   return (
-    <>
-      {/* Display current media details (movie or TV show) */}
-      <CurrentMediaDetailes media={movie} />
-
-      {/* Display media comments and user reviews */}
-      <MediaCommentsAndReviews data={upComingMovies} />
-
-      <div className="my-4">
-        {/* Slider showing top-rated similar movies */}
-        <SliderTopRated
-          bigTitle="Similar Movies"
-          dataType="movies"
-          data={
-            similarMovies && similarMovies.length > 0
-              ? similarMovies
-              : upComingMovies
-          }
+    <div className="relative bg-black min-h-screen">
+      {/* 1. Backdrop Hero - Full width background */}
+      <div className="absolute top-0 left-0 w-full h-[45vh] lg:h-[60vh] z-0">
+        <Img
+          src={`https://image.tmdb.org/t/p/original${movie.backdrop_path || movie.poster_path}`}
+          className="w-full h-full object-cover"
         />
+        <div className="absolute inset-0 bg-linear-to-t from-black via-black/60 to-transparent" />
+        <div className="absolute inset-0 bg-black/40 lg:bg-black/30" />
       </div>
 
-      {/* Display movie trailer */}
-      <MediaTrailer trailer={trailer} />
-    </>
+      <div className="relative z-10 pt-[15vh] lg:pt-[25vh]">
+        <div className="custom-container flex flex-col xl:flex-row gap-8 xl:gap-12">
+          {/* 2. Left Sidebar - Poster, Title, Meta, Top 10 */}
+          <div className="w-full xl:w-[320px] shrink-0">
+            <CurrentMediaDetailes
+              media={movie}
+              topMovies={topRatedForSidebar}
+            />
+          </div>
+
+          {/* 3. Main Content - Actions, Tabs, Grids, Social */}
+          <div className="flex-1 flex flex-col gap-8 xl:gap-12 pb-20">
+            <MediaCommentsAndReviews
+              data={upComingMovies}
+              media={movie}
+              similarMovies={similarMovies}
+            />
+
+            <div className="order-first xl:order-none">
+              <MediaTrailer trailer={trailer} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

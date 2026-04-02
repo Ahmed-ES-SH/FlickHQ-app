@@ -7,7 +7,7 @@ export default async function FetchData(api: string, paginationState: boolean) {
   try {
     // إذا كانت التصنيفات مخزنة بالفعل في الذاكرة، إرجاعها مباشرة
     if (api === "/genre/movie/list?language=en" && cachedGenres) {
-      return cachedGenres;
+      return { genres: cachedGenres };
     }
 
     const options = {

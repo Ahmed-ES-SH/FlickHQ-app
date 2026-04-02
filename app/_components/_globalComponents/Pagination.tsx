@@ -37,18 +37,18 @@ export default function Pagination({
   };
 
   return (
-    <div className="w-full min-h-[70px] bg-fourth_color rounded-xl p-2 flex items-center justify-center mt-6">
+    <div className="w-full min-h-[70px] bg-[#141414] rounded-md p-2 flex items-center justify-center mt-6">
       <div className="w-[95%] mx-auto max-md:flex-col max-md:gap-2 flex items-center justify-between">
         <div className="flex items-center gap-1">
-          <span className="text-primary_blue ">{`${currentPage} `}</span>
-          <span className="text-gray-300 "> From </span>
-          <span className="text-secondery-green ">{` ${totalPages}`}</span>
+          <span className="text-accent">{currentPage}</span>
+          <span className="text-gray-500">of</span>
+          <span className="text-gray-300">{totalPages}</span>
         </div>
         <div className="flex items-center flex-wrap gap-3">
           <button
             disabled={currentPage === 1}
             onClick={() => handlePageChange(currentPage - 1)}
-            className="w-8 h-8 max-md:w-6 max-md:h-6 flex items-center justify-center text-white bg-thired_dash rounded-md disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-8 h-8 max-md:w-6 max-md:h-6 flex items-center justify-center text-white bg-[#1a1a1a] rounded-md disabled:cursor-not-allowed disabled:opacity-50 hover:bg-[#222] transition-colors"
           >
             <BsArrowLeftShort className="size-6" />
           </button>
@@ -79,7 +79,7 @@ export default function Pagination({
           <button
             disabled={currentPage === totalPages}
             onClick={() => handlePageChange(currentPage + 1)}
-            className="w-8 h-8 max-md:w-6 max-md:h-6 flex items-center justify-center text-white bg-thired_dash rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-8 h-8 max-md:w-6 max-md:h-6 flex items-center justify-center text-white bg-[#1a1a1a] rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#222] transition-colors"
           >
             <BsArrowRightShort className="size-6" />
           </button>

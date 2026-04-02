@@ -13,18 +13,18 @@ export default function IconsCard({ media }: props) {
     useList();
   return (
     <>
-      <div className="flex items-center justify-between w-full absolute -bottom-40 group-hover:bottom-2  left-1/2 -translate-x-1/2 duration-700  p-3">
+      <div className="flex items-center justify-between w-full absolute -bottom-40 group-hover:bottom-2 z-10 left-1/2 -translate-x-1/2 duration-700 p-3">
         <div
           onClick={() => handleAddMediaToWatchedlist(media)}
-          className="flex items-center justify-center w-10 h-10 gap-1 p-[6px] bg-secondery-green rounded-md cursor-pointer group/heart"
+          className="flex items-center justify-center bg-sky-400 w-10 h-10 gap-1 p-[6px] glass_bg border border-white/10 hover:border-accent hover:bg-accent/20 rounded-md cursor-pointer group/heart transition-all duration-300 shadow-xl"
         >
-          <FaRegEye className="size-6 text-white group-hover/heart:text-black duration-300" />
+          <FaRegEye className="size-5 text-gray-300 group-hover/heart:text-white duration-300" />
         </div>
         <div
           onClick={() => handleAddMedia(setWatchList, media)}
-          className="flex items-center justify-center w-10 h-10 gap-1 p-[6px] bg-yellow-300 rounded-md cursor-pointer group/heart"
+          className="flex items-center justify-center w-10 h-10 gap-1 p-[6px] glass_bg border border-white/10 hover:border-accent hover:bg-accent/20 rounded-md cursor-pointer group/heart transition-all duration-300 shadow-xl"
         >
-          <FaRegEyeSlash className="size-6 text-white group-hover/heart:text-black duration-300" />
+          <FaRegEyeSlash className="size-5 text-gray-300 group-hover/heart:text-white duration-300" />
         </div>
       </div>
     </>

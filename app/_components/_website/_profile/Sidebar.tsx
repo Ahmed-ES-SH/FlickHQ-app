@@ -1,20 +1,13 @@
 "use client";
 import React, { useEffect } from "react";
-import Img from "../../_globalComponents/Img";
 import { FaBars, FaEye, FaHeart, FaHome, FaList, FaUser } from "react-icons/fa";
 import Link from "next/link";
 import { MdLogout } from "react-icons/md";
 import { RxCross1 } from "react-icons/rx";
 import { useVariables } from "@/app/context/VariablesContext";
 import { motion, AnimatePresence } from "framer-motion";
-import { useClerk, useUser } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
-import Loading from "@/app/shows/loading";
 
 export default function Sidebar() {
-  const router = useRouter();
-  const { signOut } = useClerk();
-  const { user } = useUser();
   const { showSidebar, setShowSidebar, width } = useVariables();
   const iconStyle = "text-red-500";
   const profileOptions = [
@@ -65,17 +58,6 @@ export default function Sidebar() {
     },
   };
 
-  useEffect(() => {
-    if (!user) router.push("/signin");
-  }, [router, user]);
-
-  const handleLogout = async () => {
-    await signOut();
-    router.push("/signin");
-  };
-
-  if (!user) return <Loading />;
-
   return (
     <>
       {!showSidebar && (
@@ -99,15 +81,15 @@ export default function Sidebar() {
                 className="text-red-400  top-2 right-2 cursor-pointer size-6 w-fit ml-auto block lg:hidden"
               />
               {/* Avatar */}
-              <div className="lg:w-48 lg:h-48 w-32 h-32 mx-auto rounded-full flex items-center justify-center border-2 border-sky-400">
+              {/* <div className="lg:w-48 lg:h-48 w-32 h-32 mx-auto rounded-full flex items-center justify-center border-2 border-sky-400">
                 <Img
                   src={user.imageUrl}
                   className="w-full h-full rounded-full object-cover"
                 />
-              </div>
-              <p className="my-2 text-white text-center">
+              </div> */}
+              {/* <p className="my-2 text-white text-center">
                 {user.fullName || "No Name Found"}
-              </p>
+              </p> */}
               <div className="flex flex-col w-full gap-4 mt-8">
                 {profileOptions.map((opation, index) => (
                   <Link
@@ -132,10 +114,7 @@ export default function Sidebar() {
                   <p className="text-red-400 hover:text-red-500">Home</p>
                   <FaHome className={`${iconStyle}`} />
                 </Link>
-                <div
-                  onClick={handleLogout}
-                  className=" cursor-pointer flex items-center justify-between w-full"
-                >
+                <div className=" cursor-pointer flex items-center justify-between w-full">
                   <p className="text-red-400 hover:text-red-500">Log out</p>
                   <MdLogout className={`${iconStyle}`} />
                 </div>

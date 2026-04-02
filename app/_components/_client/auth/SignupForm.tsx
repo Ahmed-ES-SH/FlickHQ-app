@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { FaEnvelope, FaEye, FaEyeSlash, FaLock, FaUser } from "react-icons/fa";
 import { motion } from "framer-motion";
-import { useSignUp, useUser } from "@clerk/nextjs";
+
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { VscLoading } from "react-icons/vsc";
@@ -12,16 +12,7 @@ import OtherMethods from "./OtherMethods";
 import VerifyCode from "./VerifyCode";
 
 export default function SignupForm() {
-  const { user } = useUser();
-  const { isLoaded, signUp } = useSignUp();
-
   const router = useRouter();
-  // This not Necessary because middleware File but Just in case
-  useEffect(() => {
-    if (user) {
-      router.push(`/`);
-    }
-  }, [user, router]);
 
   const [form, setForm] = useState({
     name: "",
@@ -65,67 +56,30 @@ export default function SignupForm() {
     setPasswordFildType((prev) => !prev);
   };
 
-  const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!isLoaded) {
-      return;
-    }
-
-    // ✅ Validate empty form fields
-    if (!form.email || !form.password || !form.name) {
-      toast.error("Please Write Your Email and Password , Name");
-      return;
-    }
-    try {
-      setTrySign(true);
-      await signUp.create({
-        emailAddress: form.email,
-        password: form.password,
-      });
-      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
-      toast.success(
-        "The account has been created successfully. Please check your email to activate the account and log in at any time."
-      );
-      setPendingVerification(true);
-      setForm({
-        name: "",
-        email: "",
-        password: "",
-      });
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      const errorMessage = error.errors?.[0]?.message;
-      toast.error(errorMessage);
-    } finally {
-      setTrySign(false);
-    }
-  };
-
   return (
     <>
       {!pendingVerification ? (
         <>
-          <form
-            onSubmit={handleSubmit}
-            className="flex flex-col gap-6 items-center w-full"
-          >
+          <form className="flex flex-col gap-5 items-center w-full">
             <div className="hidden" id="clerk-captcha" />
             {/* Inputs Section */}
             {inputs.map((input, index) => (
-              <div key={index} className="w-full relative">
+              <div key={index} className="w-full relative group">
                 {input.type == "password" && form.password.length > 0 && (
                   <div
                     onClick={handleChangePasswordFildType}
-                    className=" absolute top-1/2 -translate-y-1/2 right-4"
+                    className=" absolute top-1/2 -translate-y-1/2 right-4 z-10"
                   >
                     {passwordFildType ? (
-                      <FaEyeSlash className="size-5 text-gray-400 cursor-pointer" />
+                      <FaEyeSlash className="size-5 text-gray-500 hover:text-white cursor-pointer duration-300" />
                     ) : (
-                      <FaEye className="size-5 text-gray-400 cursor-pointer" />
+                      <FaEye className="size-5 text-gray-500 hover:text-white cursor-pointer duration-300" />
                     )}
                   </div>
                 )}
-                {input.icon}
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-accent duration-300">
+                  {input.icon}
+                </div>
                 <input
                   onChange={onChange}
                   value={input.value}
@@ -138,42 +92,47 @@ export default function SignupForm() {
                       : input.type
                   }
                   placeholder={input.placeHolder}
-                  className="w-full pl-10 pr-4 py-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-primary_blue placeholder:text-gray-400"
+                  className="w-full pl-10 pr-4 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent duration-300 placeholder:text-gray-500"
                 />
               </div>
             ))}
 
             {/* Sign up btn*/}
             <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              className="bg-primary_blue hover:bg-blue-600 text-white px-6 py-3 w-full rounded-lg font-semibold flex items-center justify-center gap-2 duration-300"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="relative bg-accent hover:bg-[#ff0a16] text-white px-6 py-4 w-full rounded-xl font-bold uppercase tracking-wider flex items-center justify-center gap-2 duration-300 shadow-lg shadow-accent/20 overflow-hidden group/btn"
             >
+              {/* Shimmer Effect */}
+              <div className="absolute inset-0 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-1000 bg-linear-to-r from-transparent via-white/20 to-transparent" />
+
               {trySign ? (
                 <motion.div
                   animate={{ rotate: "360deg" }}
                   transition={{ duration: 0.5, repeat: Infinity }}
                 >
-                  <VscLoading />
+                  <VscLoading className="size-5" />
                 </motion.div>
               ) : (
-                <p>Sign up</p>
+                <p className="relative z-10">Join Experience</p>
               )}
             </motion.button>
           </form>
 
           {/* other methods*/}
-          <div className="w-full text-center text-gray-400 text-sm">
-            or sign up with
+          <div className="w-full flex items-center gap-4 text-gray-500 text-xs uppercase tracking-widest font-bold">
+            <div className="h-[1px] flex-1 bg-white/10"></div>
+            <span>or sign up with</span>
+            <div className="h-[1px] flex-1 bg-white/10"></div>
           </div>
 
           {/* Other Sign in Method */}
           <OtherMethods />
 
-          <div className="flex gap-1 mt-4">
-            <h2>You have an account?</h2>
-            <Link href={"/signin"} className="text-primary_blue underline">
-              Login
+          <div className="flex gap-2 mt-4 text-gray-400 font-medium">
+            <h2>Already a member?</h2>
+            <Link href={"/signin"} className="text-accent hover:text-white underline underline-offset-4 duration-300">
+              Sign In
             </Link>
           </div>
         </>
