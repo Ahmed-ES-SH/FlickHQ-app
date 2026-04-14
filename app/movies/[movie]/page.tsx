@@ -77,7 +77,6 @@ export default async function page({ searchParams }: any) {
           <div className="flex-1 flex flex-col gap-8 xl:gap-12 pb-20">
             <MediaCommentsAndReviews
               data={upComingMovies}
-              media={movie}
               similarMovies={similarMovies}
             />
 

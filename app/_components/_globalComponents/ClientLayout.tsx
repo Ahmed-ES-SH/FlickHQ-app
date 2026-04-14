@@ -3,6 +3,7 @@ import React, { ReactNode, useState } from "react";
 import DataProvider from "@/app/context/DataContext";
 import ListProvider from "@/app/context/ListContext";
 import VaribalesProvider from "@/app/context/VariablesContext";
+import { AuthProvider } from "@/app/context/AuthContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 type ClientLayoutProps = {
@@ -14,11 +15,13 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
   return (
     <>
       <QueryClientProvider client={queryClient}>
-        <VaribalesProvider>
-          <ListProvider>
-            <DataProvider>{children}</DataProvider>
-          </ListProvider>
-        </VaribalesProvider>
+        <AuthProvider>
+          <VaribalesProvider>
+            <ListProvider>
+              <DataProvider>{children}</DataProvider>
+            </ListProvider>
+          </VaribalesProvider>
+        </AuthProvider>
       </QueryClientProvider>
     </>
   );

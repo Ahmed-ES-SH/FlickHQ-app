@@ -50,3 +50,22 @@ export interface ListContextType {
   ) => void;
   handleAddMediaToWatchedlist: (media: ShowType) => void;
 }
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  avatar?: string;
+}
+
+export interface AuthContextType {
+  user: User | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  loading: boolean;
+  login: (data: any) => Promise<void>;
+  register: (data: any) => Promise<void>;
+  logout: () => void;
+  checkAuth: () => Promise<void>;
+}

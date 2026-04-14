@@ -12,3 +12,17 @@ export const latestMoviesApi = "/movie/latest";
 export const upcomingMovies = "/movie/upcoming?language=en-US&";
 export const upcomingShows = "/tv/popular?language=en-US&";
 // GET https://api.themoviedb.org/3/discover/movie?with_genres=28&language=en-US&page=1
+
+export const API_ENDPOINTS = {
+  AUTH: {
+    login: "api/auth/login",
+    register: "api/auth/register",
+    logout: "api/auth/logout",
+    verify: "api/auth/verify-email",
+    updateProfile: "api/auth/update-user",
+    resetPassword: "api/auth/rest-password",
+    sendResetPassword: "api/auth/rest-password/send",
+    verifyResetToken: "api/auth/rest-password/verify",
+    currentUser: "api/auth/current-user",
+  },
+};

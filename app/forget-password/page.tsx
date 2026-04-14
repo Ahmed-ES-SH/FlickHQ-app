@@ -37,37 +37,44 @@ export default function ForgetPassword() {
       >
         <div className="flex flex-col gap-8">
           <motion.div
-             initial={{ y: 20, opacity: 0 }}
-             animate={{ y: 0, opacity: 1 }}
-             transition={{ delay: 0.3, duration: 0.8 }}
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
           >
-            <motion.div 
+            <motion.div
               whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
               className="w-fit"
             >
-              <Img src="/logo.webp" className="w-32 mb-8 drop-shadow-[0_0_15px_rgba(229,9,20,0.3)]" />
+              <Img
+                src="/logo.webp"
+                className="w-32 mb-8 drop-shadow-[0_0_15px_rgba(229,9,20,0.3)]"
+              />
             </motion.div>
-            
+
             <h1 className="text-white text-5xl lg:text-7xl font-black tracking-tighter mb-4 leading-[0.9] uppercase italic">
               Lost your <br />
-              <span className="text-accent drop-shadow-[0_0_20px_rgba(229,9,20,0.4)]">Access?</span>
+              <span className="text-accent drop-shadow-[0_0_20px_rgba(229,9,20,0.4)]">
+                Access?
+              </span>
             </h1>
             <p className="text-lg text-gray-400 font-medium max-w-xs leading-snug">
-              No worries. Enter your email and we'll <br />
-              <span className="text-gray-500 italic">get you back into the action.</span>
+              {`No worries. Enter your email and we'll`} <br />
+              <span className="text-gray-500 italic">
+                get you back into the action.
+              </span>
             </p>
           </motion.div>
 
           <motion.div
-             initial={{ y: 30, opacity: 0 }}
-             animate={{ y: 0, opacity: 1 }}
-             transition={{ delay: 0.5, duration: 0.8 }}
-             className="bg-white/[0.03] backdrop-blur-2xl rounded-3xl p-8 border border-white/10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] relative overflow-hidden group space-y-6"
+            initial={{ y: 30, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.8 }}
+            className="bg-white/[0.03] backdrop-blur-2xl rounded-3xl p-8 border border-white/10 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] relative overflow-hidden group space-y-6"
           >
             {/* Subtle glow inside the card */}
             <div className="absolute -top-24 -right-24 w-48 h-48 bg-accent/10 rounded-full blur-[60px] group-hover:bg-accent/20 transition-colors duration-700" />
-            
+
             <div className="w-full relative group/input">
               <FaEnvelope className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within/input:text-accent duration-300" />
               <input
@@ -85,8 +92,8 @@ export default function ForgetPassword() {
               Send Instructions
             </motion.button>
 
-            <Link 
-              href="/signin" 
+            <Link
+              href="/signin"
               className="flex items-center justify-center gap-2 text-gray-400 hover:text-white transition-colors duration-300 text-sm font-medium group/link"
             >
               <FaArrowLeft className="size-3 group-hover/link:-translate-x-1 duration-300" />
@@ -97,17 +104,17 @@ export default function ForgetPassword() {
       </motion.div>
 
       {/* Interactive Aesthetic Detail: Subtle Parallax Glow */}
-      <motion.div 
-        animate={{ 
+      <motion.div
+        animate={{
           x: [0, 20, 0],
           y: [0, -20, 0],
         }}
-        transition={{ 
+        transition={{
           duration: 14,
           repeat: Infinity,
-          ease: "easeInOut"
+          ease: "easeInOut",
         }}
-        className="absolute top-[20%] right-[-10%] w-[500px] h-[500px] bg-accent/10 rounded-full blur-[120px] pointer-events-none" 
+        className="absolute top-[20%] right-[-10%] w-[500px] h-[500px] bg-accent/10 rounded-full blur-[120px] pointer-events-none"
       />
     </div>
   );
