@@ -1,0 +1,182 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-21T01:48:00Z",
+  "title": "Design System: FlickHQ",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Cinematic Crimson",
+        "canonical": "oklch(54% 0.25 24)",
+        "tonalRamp": [
+          "oklch(15% 0.10 24)",
+          "oklch(25% 0.15 24)",
+          "oklch(38% 0.20 24)",
+          "oklch(54% 0.25 24)",
+          "oklch(65% 0.22 24)",
+          "oklch(76% 0.18 24)",
+          "oklch(86% 0.12 24)",
+          "oklch(95% 0.05 24)"
+        ]
+      },
+      "secondary": {
+        "role": "secondary",
+        "displayName": "Marquee Gold",
+        "canonical": "oklch(74% 0.17 76)",
+        "tonalRamp": [
+          "oklch(20% 0.05 76)",
+          "oklch(32% 0.08 76)",
+          "oklch(48% 0.12 76)",
+          "oklch(74% 0.17 76)",
+          "oklch(80% 0.15 76)",
+          "oklch(86% 0.12 76)",
+          "oklch(91% 0.08 76)",
+          "oklch(96% 0.04 76)"
+        ]
+      },
+      "neutral-bg": {
+        "role": "neutral",
+        "displayName": "Midnight Obsidian",
+        "canonical": "oklch(0% 0 0)",
+        "tonalRamp": [
+          "oklch(5% 0 0)",
+          "oklch(15% 0 0)",
+          "oklch(30% 0 0)",
+          "oklch(45% 0 0)",
+          "oklch(60% 0 0)",
+          "oklch(75% 0 0)",
+          "oklch(88% 0 0)",
+          "oklch(96% 0 0)"
+        ]
+      },
+      "neutral-panel": {
+        "role": "neutral",
+        "displayName": "Shadow Velvet",
+        "canonical": "oklch(15% 0.005 240)",
+        "tonalRamp": [
+          "oklch(8% 0.005 240)",
+          "oklch(18% 0.005 240)",
+          "oklch(32% 0.005 240)",
+          "oklch(48% 0.005 240)",
+          "oklch(64% 0.005 240)",
+          "oklch(78% 0.005 240)",
+          "oklch(88% 0.005 240)",
+          "oklch(96% 0.005 240)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display Title",
+        "purpose": "Large, theatrical headlines, hero movie names, and high-impact calls to action."
+      },
+      "headline": {
+        "displayName": "Section Headline",
+        "purpose": "Primary section titles, such as listing categories, plan grids, and trending banners."
+      },
+      "title": {
+        "displayName": "Component Title",
+        "purpose": "Title descriptions on movie posters, metadata titles, and pricing options."
+      },
+      "body": {
+        "displayName": "Main Body",
+        "purpose": "Movie synopsis, user reviews, policy pages, and general narrative texts."
+      },
+      "label": {
+        "displayName": "Action Label",
+        "purpose": "Tags, category filters, movie ratings, runtimes, and small navigation links."
+      }
+    },
+    "shadows": [
+      {
+        "name": "Crimson Halo",
+        "value": "0 0 30px rgba(229, 9, 20, 0.15)",
+        "purpose": "Backlit crimson aura under elevated active cards and buttons."
+      },
+      {
+        "name": "Midnight Ambient",
+        "value": "0 10px 40px rgba(0, 0, 0, 0.5)",
+        "purpose": "Deep ambient background shadow to float dropdown menus and auth panels."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out-expo",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Premium fluid acceleration curve for card expansion, navigation fades, and button scaling."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Premium call-to-actions, subscription actions, and emphasized buttons.",
+      "html": "<button class=\"ds-btn-primary\">SELECT PLAN</button>",
+      "css": ".ds-btn-primary { background: #E50914; color: #ffffff; padding: 14px 28px; font-family: Outfit, sans-serif; font-size: 0.875rem; font-weight: 500; border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1); } .ds-btn-primary:hover { background-color: #b80710; } .ds-btn-primary:active { transform: scale(0.98); }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Standard actions, info requests, and secondary control elements.",
+      "html": "<button class=\"ds-btn-secondary\">LEARN MORE</button>",
+      "css": ".ds-btn-secondary { background: #1a1a1a; color: #ffffff; padding: 14px 28px; font-family: Outfit, sans-serif; font-size: 0.875rem; font-weight: 500; border: 1px solid rgba(255,255,255,0.05); border-radius: 4px; cursor: pointer; transition: background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1); } .ds-btn-secondary:hover { background-color: #222222; border-color: rgba(255,255,255,0.1); } .ds-btn-secondary:active { transform: scale(0.98); }"
+    },
+    {
+      "name": "Media Card",
+      "kind": "card",
+      "refersTo": "card-media",
+      "description": "Poster thumbnail wrapper for movie and show lists.",
+      "html": "<div class=\"ds-card-media\"><div class=\"ds-card-poster\"></div><div class=\"ds-card-title\">Interstellar</div><div class=\"ds-card-meta\"><span class=\"ds-card-rating\">★ 8.6</span><span class=\"ds-card-year\">2014</span></div></div>",
+      "css": ".ds-card-media { background: #0b0b0b; border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 16px; width: 220px; font-family: Outfit, sans-serif; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1); cursor: pointer; } .ds-card-poster { height: 280px; background: #1a1a1a url('https://image.tmdb.org/t/p/w500/gEU2QvHOm5geW89DYrQ4ga4j5sn.jpg') center/cover no-repeat; border-radius: 4px; margin-bottom: 12px; } .ds-card-title { color: #ffffff; font-size: 1rem; font-weight: 600; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .ds-card-meta { display: flex; align-items: center; justify-content: space-between; font-size: 0.8125rem; color: #94a3b8; } .ds-card-rating { color: #eaa71c; font-weight: 500; } .ds-card-media:hover { transform: translateY(-4px) scale(1.03); box-shadow: 0 0 30px rgba(229, 9, 20, 0.15); border-color: rgba(229, 9, 20, 0.2); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Midnight Cinema Canopy",
+    "overview": "FlickHQ is designed to mimic the premium, dim-light atmosphere of a modern high-end cinema. Built strictly on dark, light-absorbing obsidian foundations and highlighted by hot, high-energy crimson spotlights, the visual experience prioritizes high-fidelity poster art and immersive media banners.",
+    "keyCharacteristics": [
+      "Deep Contrast Framing: Pure obsidian black backdrops that direct all eyes to colorful movie assets.",
+      "Tactile Responsive Focus: Springs, deep scales, and elegant fades that elevate elements on mouse hover.",
+      "Absolute Dark Comfort: Deep dark tones designed to protect eyes during nighttime viewing.",
+      "Bilingual Structural Balance: Native typography sizing that functions symmetrically for English and Arabic layouts."
+    ],
+    "rules": [
+      {
+        "name": "The Spotlighting Rule",
+        "body": "The Cinematic Crimson accent must occupy less than 10% of any single viewport page. It is a dramatic spotlight; overuse dilutes its premium theatrical impact.",
+        "section": "colors"
+      },
+      {
+        "name": "The Cinematic Contrast Rule",
+        "body": "Headlines must always use a minimum font weight of 700 to present a bold, theatrical silhouette, whereas body paragraphs must use a light font weight of 300 to maximize readability on bright dark screens.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat-at-Rest Rule",
+        "body": "All cards and list items remain completely flat against their background when passive. Ambient shadows and scale expansions appear only on user focus or hover to signify clickability.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do respect the Spotlighting Rule. Ensure the primary Crimson accent remains a rare, high-value focal point.",
+      "Do cap text body widths to 75 characters to avoid tiring horizontal line-sweeps in movie descriptions.",
+      "Do use smooth custom bezier transitions (cubic-bezier(0.16, 1, 0.3, 1)) for all image scale-ups on hover.",
+      "Do ensure high-contrast accessibility (AAA) by verifying readability of light text against obsidian dark backdrops."
+    ],
+    "donts": [
+      "Don't use side-stripe borders (border-left or border-right accent lines greater than 1px) to emphasize cards or notifications.",
+      "Don't use neon gradients or multi-colored text clips that mimic low-end SaaS advertising styles.",
+      "Don't offer a stark white light-mode that ruins the eye comfort of a movie-going experience.",
+      "Don't create flat, static movie poster grids that lack hover transitions and scaling feedback.",
+      "Don't break layouts or use un-optimized font weights when switching layouts from LTR (English) to RTL (Arabic)."
+    ]
+  }
+}
