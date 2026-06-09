@@ -1,14 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { FaPlay, FaHeart, FaShare, FaStar } from "react-icons/fa";
+import { FaPlay, FaHeart, FaShare, FaStar, FaRegHeart, FaRegEye } from "react-icons/fa";
 import { FiBookmark, FiMessageCircle } from "react-icons/fi";
 import Img from "@/app/_components/_globalComponents/Img";
 import MediaCard from "@/app/_components/_website/_movies/MediaCard";
 import { gener } from "@/app/types/ContextType";
 import { ShowType } from "@/app/types/websiteTypes";
+import type { MediaType } from "@/app/types/lists";
+import { useAuthStore } from "@/app/_stores/authStore";
+import { useListStore } from "@/app/_stores/listStore";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface Props {
   show: any;
@@ -34,9 +39,86 @@ const itemVariants = {
 };
 
 export default function ShowDetails({ show, similarShows, reviews }: Props) {
+  const router = useRouter();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isFavorite = useListStore((s) => (show ? s.isFavorite(show.id) : false));
+  const isWatchlisted = useListStore((s) => (show ? s.isInWatchlist(show.id) : false));
+  const isWatched = useListStore((s) => (show ? s.isWatched(show.id) : false));
+  const addItem = useListStore((s) => s.addItem);
+  const removeItem = useListStore((s) => s.removeItem);
+  const watchlistId = useListStore((s) => s.getSystemList("watchlist")?.id);
+  const favoritesId = useListStore((s) => s.getSystemList("favorites")?.id);
+  const watchedId = useListStore((s) => s.getSystemList("watched")?.id);
+
   const [activeTab, setActiveTab] = useState("overview");
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [isWatchlisted, setIsWatchlisted] = useState(false);
+  const [favLoading, setFavLoading] = useState(false);
+  const [wlLoading, setWlLoading] = useState(false);
+  const [wLoading, setWLoading] = useState(false);
+
+  const mediaType: MediaType = "tv";
+
+  const handleToggleWatchlist = useCallback(async () => {
+    if (!isAuthenticated) {
+      toast.info("Sign in to use watchlist");
+      router.push("/signin");
+      return;
+    }
+    if (!watchlistId || !show) return;
+
+    setWlLoading(true);
+    if (isWatchlisted) {
+      const ok = await removeItem(watchlistId, mediaType, show.id);
+      if (ok) toast.success("Removed from watchlist");
+      else toast.error("Failed to remove");
+    } else {
+      const ok = await addItem(watchlistId, { mediaType, tmdbId: show.id });
+      if (ok) toast.success("Added to watchlist");
+      else toast.error("Failed to add");
+    }
+    setWlLoading(false);
+  }, [isAuthenticated, watchlistId, isWatchlisted, show, addItem, removeItem, router]);
+
+  const handleToggleFavorite = useCallback(async () => {
+    if (!isAuthenticated) {
+      toast.info("Sign in to save favorites");
+      router.push("/signin");
+      return;
+    }
+    if (!favoritesId || !show) return;
+
+    setFavLoading(true);
+    if (isFavorite) {
+      const ok = await removeItem(favoritesId, mediaType, show.id);
+      if (ok) toast.success("Removed from favorites");
+      else toast.error("Failed to remove");
+    } else {
+      const ok = await addItem(favoritesId, { mediaType, tmdbId: show.id });
+      if (ok) toast.success("Added to favorites");
+      else toast.error("Failed to add");
+    }
+    setFavLoading(false);
+  }, [isAuthenticated, favoritesId, isFavorite, show, addItem, removeItem, router]);
+
+  const handleToggleWatched = useCallback(async () => {
+    if (!isAuthenticated) {
+      toast.info("Sign in to track watched");
+      router.push("/signin");
+      return;
+    }
+    if (!watchedId || !show) return;
+
+    setWLoading(true);
+    if (isWatched) {
+      const ok = await removeItem(watchedId, mediaType, show.id);
+      if (ok) toast.success("Removed from watched");
+      else toast.error("Failed to remove");
+    } else {
+      const ok = await addItem(watchedId, { mediaType, tmdbId: show.id });
+      if (ok) toast.success("Marked as watched");
+      else toast.error("Failed to mark as watched");
+    }
+    setWLoading(false);
+  }, [isAuthenticated, watchedId, isWatched, show, addItem, removeItem, router]);
 
   const showYear = new Date(show?.first_air_date).getFullYear();
   const seasonCount = show?.number_of_seasons || 0;
@@ -219,26 +301,54 @@ export default function ShowDetails({ show, similarShows, reviews }: Props) {
                   Play Now
                 </button>
                 <button
-                  onClick={() => setIsWatchlisted(!isWatchlisted)}
+                  onClick={handleToggleWatchlist}
+                  disabled={wlLoading}
                   className={`flex items-center gap-2 px-5 py-3 border rounded-xl transition-all duration-300 font-medium ${
                     isWatchlisted
                       ? "bg-accent/10 border-accent/50 text-accent"
                       : "bg-panel_bg border-white/10 text-gray-300 hover:border-accent/30 hover:text-white"
-                  }`}
+                  } disabled:opacity-60`}
                 >
-                  <FiBookmark className="size-4" />
-                  {isWatchlisted ? "Watchlisted" : "Watchlist"}
+                  {wlLoading ? (
+                    <div className="size-4 rounded-full border-2 border-current border-t-transparent animate-spin" />
+                  ) : (
+                    <FiBookmark className="size-4" />
+                  )}
+                  {wlLoading ? "..." : isWatchlisted ? "Watchlisted" : "Watchlist"}
                 </button>
                 <button
-                  onClick={() => setIsFavorite(!isFavorite)}
+                  onClick={handleToggleWatched}
+                  disabled={wLoading}
+                  className={`flex items-center gap-2 px-5 py-3 border rounded-xl transition-all duration-300 font-medium ${
+                    isWatched
+                      ? "bg-accent/10 border-accent/50 text-accent"
+                      : "bg-panel_bg border-white/10 text-gray-300 hover:border-accent/30 hover:text-white"
+                  } disabled:opacity-60`}
+                >
+                  {wLoading ? (
+                    <div className="size-4 rounded-full border-2 border-current border-t-transparent animate-spin" />
+                  ) : (
+                    <FaRegEye className="size-4" />
+                  )}
+                  {wLoading ? "..." : isWatched ? "Watched ✓" : "Watched"}
+                </button>
+                <button
+                  onClick={handleToggleFavorite}
+                  disabled={favLoading}
                   className={`flex items-center gap-2 px-5 py-3 border rounded-xl transition-all duration-300 font-medium ${
                     isFavorite
                       ? "bg-accent/10 border-accent/50 text-accent"
                       : "bg-panel_bg border-white/10 text-gray-300 hover:border-accent/30 hover:text-white"
-                  }`}
+                  } disabled:opacity-60`}
                 >
-                  <FaHeart className="size-4" />
-                  {isFavorite ? "Favorited" : "Favorite"}
+                  {favLoading ? (
+                    <div className="size-4 rounded-full border-2 border-current border-t-transparent animate-spin" />
+                  ) : isFavorite ? (
+                    <FaHeart className="size-4" />
+                  ) : (
+                    <FaRegHeart className="size-4" />
+                  )}
+                  {favLoading ? "..." : isFavorite ? "Favorited" : "Favorite"}
                 </button>
                 <button className="flex items-center gap-2 px-5 py-3 bg-panel_bg border border-white/10 text-gray-300 rounded-xl hover:border-accent/30 hover:text-white transition-all duration-300 font-medium">
                   <FiMessageCircle className="size-4" />

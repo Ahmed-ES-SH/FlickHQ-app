@@ -18,6 +18,10 @@ interface Props {
   data: ShowType[];
   /** Similar movies for the related tab */
   similarMovies?: ShowType[];
+  /** Current media item for list actions (favorites, watchlist, etc.) */
+  media?: ShowType;
+  /** Disable the Playlist dropdown button */
+  disablePlaylist?: boolean;
 }
 
 /**
@@ -29,6 +33,8 @@ interface Props {
 export default function MediaCommentsAndReviews({
   data,
   similarMovies,
+  media,
+  disablePlaylist,
 }: Props) {
   const { genres } = useData();
 
@@ -109,7 +115,9 @@ export default function MediaCommentsAndReviews({
     <div className="flex flex-col gap-10 lg:gap-12">
       {/* Action Bar - Play, Watchlist, Favorites, Share, Comments */}
       <MediaActionBar
+        media={media}
         onOpenComments={() => handleTabChange("comments")}
+        disablePlaylist={disablePlaylist}
       />
 
       {/* Content Tabs - Recommended, Related, Cast, Extras, Reviews, Comments */}

@@ -1,7 +1,6 @@
-import React from "react";
 import FetchData from "@/app/hooks/FetchData";
-import { trendingMovies, trendingShows } from "@/app/constants/apis";
 import HeroSlider from "../../_client/Sliders/HeroSlider";
+import { trendingMovies, trendingShows } from "@/app/constants/apis";
 
 export default async function HeroSection() {
   const { results: moviesResults } = await FetchData(trendingMovies, false);

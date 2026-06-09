@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Subscription Management | FlickHQ</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary": "#003061",
+                    "surface-container-low": "#2a1614",
+                    "on-primary-container": "#fff7f6",
+                    "tertiary-container": "#0072d7",
+                    "on-tertiary-fixed-variant": "#004689",
+                    "on-primary-fixed": "#410001",
+                    "on-secondary-container": "#4e3400",
+                    "slate-silver": "#94A3B8",
+                    "surface": "#200e0c",
+                    "inverse-primary": "#c0000c",
+                    "tertiary-fixed-dim": "#a7c8ff",
+                    "surface-container": "#2e1a18",
+                    "error-container": "#93000a",
+                    "on-secondary": "#432c00",
+                    "primary-fixed": "#ffdad5",
+                    "on-primary-fixed-variant": "#930007",
+                    "surface-variant": "#462f2c",
+                    "on-background": "#ffdad5",
+                    "surface-container-highest": "#462f2c",
+                    "surface-dim": "#200e0c",
+                    "inverse-on-surface": "#412b28",
+                    "surface-container-lowest": "#1a0908",
+                    "on-error-container": "#ffdad6",
+                    "outline-variant": "#5e3f3b",
+                    "on-primary": "#690003",
+                    "error": "#ffb4ab",
+                    "secondary-fixed": "#ffdeac",
+                    "secondary-fixed-dim": "#ffba36",
+                    "on-surface": "#ffdad5",
+                    "on-error": "#690005",
+                    "midnight-obsidian": "#000000",
+                    "charcoal-input": "#141414",
+                    "primary-container": "#e50914",
+                    "outline": "#af8782",
+                    "muted-gray": "#7D8185",
+                    "on-tertiary-container": "#f8f9ff",
+                    "primary-fixed-dim": "#ffb4aa",
+                    "on-secondary-fixed-variant": "#5f4100",
+                    "background": "#200e0c",
+                    "surface-bright": "#4a3330",
+                    "secondary-container": "#d79700",
+                    "on-secondary-fixed": "#281900",
+                    "secondary": "#ffba36",
+                    "shadow-velvet": "#0B0B0B",
+                    "surface-tint": "#ffb4aa",
+                    "on-surface-variant": "#e9bcb6",
+                    "primary": "#ffb4aa",
+                    "tertiary": "#a7c8ff",
+                    "on-tertiary-fixed": "#001b3c",
+                    "surface-container-high": "#3a2522",
+                    "tertiary-fixed": "#d5e3ff",
+                    "inverse-surface": "#ffdad5"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "lg": "24px",
+                    "gutter": "16px",
+                    "container-margin": "24px",
+                    "xs": "4px",
+                    "sm": "8px",
+                    "xl": "32px"
+            },
+            "fontFamily": {
+                    "mono": ["ui-monospace"],
+                    "display-mobile": ["Outfit"],
+                    "title": ["Outfit"],
+                    "display": ["Outfit"],
+                    "body": ["Outfit"],
+                    "label": ["Outfit"],
+                    "headline": ["Outfit"]
+            },
+            "fontSize": {
+                    "mono": ["14px", {"lineHeight": "1.4", "fontWeight": "400"}],
+                    "display-mobile": ["40px", {"lineHeight": "1.1", "fontWeight": "800"}],
+                    "title": ["20px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "display": ["64px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "body": ["16px", {"lineHeight": "1.6", "fontWeight": "300"}],
+                    "label": ["14px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                    "headline": ["30px", {"lineHeight": "1.2", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #000000;
+            color: #ffdad5;
+            font-family: 'Outfit', sans-serif;
+            min-height: 150vh;
+        }
+        .crimson-halo:hover {
+            box-shadow: 0 0 30px rgba(229, 9, 20, 0.15);
+            transform: scale(1.01);
+        }
+        .gold-glow {
+            box-shadow: 0 0 20px rgba(234, 167, 28, 0.2);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a0908;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #462f2c;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #e50914;
+        }
+    </style>
+</head>
+<body class="min-h-[150vh]">
+<!-- Top Navigation -->
+<header class="fixed top-0 w-full z-50 bg-midnight-obsidian/60 backdrop-blur-md flex justify-between items-center px-lg py-md border-b border-white/5">
+<div class="font-display text-title font-extrabold tracking-tighter text-primary-container">FlickHQ</div>
+<nav class="hidden md:flex items-center gap-xl">
+<a class="font-label text-label text-on-surface-variant hover:text-on-surface transition-colors" href="#">Movies</a>
+<a class="font-label text-label text-on-surface-variant hover:text-on-surface transition-colors" href="#">TV Series</a>
+<a class="font-label text-label text-on-surface-variant hover:text-on-surface transition-colors" href="#">Categories</a>
+<a class="font-label text-label text-on-surface-variant hover:text-on-surface transition-colors" href="#">My List</a>
+</nav>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-on-surface-variant hover:scale-105 transition-transform">search</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:scale-105 transition-transform">notifications</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant/30">
+<img alt="User Profile Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMHV9pOqyTYz12uDQHBye_qNsl_8BohJiimn3MNlGAHEnTa8PRkGlVKKptoCfHqnmlkREhVzEDjuOrwwHkul61QMwFsqT9RBC1z51HTis40RAwmHMo3hq_X2gWZgroO2f00zOxsZlJRJGKTJjV6QijTjghhby2Y6t2P_8lqo1NZ7EyEF6oMaRihQFw0qqQjb1aTw2Ra2j3A5gIl3rIU8517a_rWlgVmDmlFwK30l6Kq23KzzRzNmhXCqEGIyVJzFVwC8u0IR0IH-0"/>
+</div>
+</div>
+</header>
+<main class="pt-32 pb-xl px-lg max-w-7xl mx-auto space-y-lg">
+<!-- Profile Overview Section -->
+<section class="bg-shadow-velvet border border-white/5 p-lg rounded-xl flex flex-col md:flex-row justify-between items-center gap-lg">
+<div class="flex items-center gap-md">
+<div class="relative">
+<img alt="Julian Thorne" class="w-24 h-24 rounded-xl object-cover border-2 border-primary-container" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiuqvipWBvlEcMOHvZUrjm6BQw0x_KtGBOqvGEuwQ9tp31pZKrEotGmyIm5r72eUDsP2oLqrJM1lskw6t4lp-khxsVZvpalR37xQ2qRbF2p2dGTpQfBJLR7tpEf0UG9uLCs2uQBLoKqfEgFdbp05brlLzFxP0y-4bSVWSeSamDBcVbYnin29pxHncwh_UMIXEX75Ko9b-KPAruntHERfyIar90LTYygTBck54-AKqln6DIwyl5XfzdY1ykSkPxoqBM2ZMdVAxfb0I"/>
+<span class="absolute -bottom-2 -right-2 bg-secondary-container text-on-secondary-container text-[10px] font-bold px-2 py-0.5 rounded-full gold-glow">PRO</span>
+</div>
+<div>
+<h1 class="font-headline text-headline text-on-surface">Julian Thorne</h1>
+<p class="font-body text-label text-slate-silver">Member since October 2021</p>
+</div>
+</div>
+<div class="flex gap-xl w-full md:w-auto overflow-x-auto">
+<div class="flex flex-col items-center p-md bg-charcoal-input rounded-lg border border-white/5 min-w-[120px]">
+<span class="font-display text-title text-primary-container">48</span>
+<span class="font-label text-[12px] text-slate-silver uppercase tracking-widest">Movies Watched</span>
+</div>
+<div class="flex flex-col items-center p-md bg-charcoal-input rounded-lg border border-white/5 min-w-[120px]">
+<span class="font-display text-title text-primary-container">12</span>
+<span class="font-label text-[12px] text-slate-silver uppercase tracking-widest">Series Binged</span>
+</div>
+<div class="flex flex-col items-center p-md bg-charcoal-input rounded-lg border border-white/5 min-w-[120px]">
+<span class="font-display text-title text-primary-container">420h</span>
+<span class="font-label text-[12px] text-slate-silver uppercase tracking-widest">Total Time</span>
+</div>
+</div>
+</section>
+<!-- Current Plan & Details Expanded -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+<!-- Main Plan Status -->
+<section class="lg:col-span-2 space-y-lg">
+<div class="bg-shadow-velvet border border-white/5 p-lg rounded-xl space-y-lg relative overflow-hidden">
+<div class="flex justify-between items-start">
+<div>
+<span class="font-label text-[12px] text-primary-container font-bold tracking-[0.2em] uppercase">Current Plan</span>
+<h2 class="font-headline text-headline mt-1">Premium 4K</h2>
+</div>
+<span class="bg-primary-container text-white px-3 py-1 rounded-full text-xs font-bold uppercase">Active</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-xl">
+<!-- Storage & Quality -->
+<div class="space-y-md">
+<div class="space-y-sm">
+<div class="flex justify-between text-xs font-label">
+<span class="text-slate-silver uppercase">Offline Storage</span>
+<span class="text-on-surface">68%</span>
+</div>
+<div class="h-1.5 w-full bg-charcoal-input rounded-full overflow-hidden">
+<div class="h-full bg-primary-container" style="width: 68%"></div>
+</div>
+<p class="text-[11px] text-slate-silver">34.2 GB of 50 GB used across 2 devices</p>
+</div>
+<div class="space-y-sm pt-md border-t border-white/5">
+<span class="text-xs font-label text-slate-silver uppercase block">Plan Benefits</span>
+<div class="grid grid-cols-2 gap-sm">
+<div class="flex items-center gap-2 text-[13px] text-on-surface">
+<span class="material-symbols-outlined text-primary-container text-sm">check_circle</span>
+                                    Spatial Audio
+                                </div>
+<div class="flex items-center gap-2 text-[13px] text-on-surface">
+<span class="material-symbols-outlined text-primary-container text-sm">check_circle</span>
+                                    No Ads
+                                </div>
+<div class="flex items-center gap-2 text-[13px] text-on-surface">
+<span class="material-symbols-outlined text-primary-container text-sm">check_circle</span>
+                                    Early Access
+                                </div>
+<div class="flex items-center gap-2 text-[13px] text-on-surface">
+<span class="material-symbols-outlined text-primary-container text-sm">check_circle</span>
+                                    4K HDR Support
+                                </div>
+</div>
+</div>
+</div>
+<!-- Usage Insights Mini -->
+<div class="space-y-md bg-midnight-obsidian/40 p-md rounded-lg border border-white/5">
+<span class="text-xs font-label text-slate-silver uppercase block">Usage Insights</span>
+<div class="space-y-lg">
+<div class="flex items-end gap-2 h-20">
+<div class="bg-primary-container/20 w-full rounded-t" style="height: 40%"></div>
+<div class="bg-primary-container/40 w-full rounded-t" style="height: 60%"></div>
+<div class="bg-primary-container/60 w-full rounded-t" style="height: 90%"></div>
+<div class="bg-primary-container w-full rounded-t" style="height: 75%"></div>
+<div class="bg-primary-container/50 w-full rounded-t" style="height: 45%"></div>
+</div>
+<div class="flex justify-between items-center text-[11px] text-slate-silver">
+<span>Most Watched: <strong class="text-on-surface">Sci-Fi</strong></span>
+<span>Data: <strong class="text-on-surface">112GB/mo</strong></span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Active Device Management -->
+<div class="bg-shadow-velvet border border-white/5 p-lg rounded-xl space-y-md">
+<div class="flex justify-between items-center">
+<h3 class="font-title text-title">Active Devices</h3>
+<span class="text-xs text-slate-silver">3 of 4 concurrent streams active</span>
+</div>
+<div class="divide-y divide-white/5">
+<div class="py-md flex justify-between items-center">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary-container p-2 bg-charcoal-input rounded">tv</span>
+<div>
+<p class="text-sm font-label">Living Room TV</p>
+<p class="text-[11px] text-slate-silver">Sony Bravia 4K • Active Now</p>
+</div>
+</div>
+<button class="text-xs font-label text-primary-container hover:underline">Logout</button>
+</div>
+<div class="py-md flex justify-between items-center">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary-container p-2 bg-charcoal-input rounded">smartphone</span>
+<div>
+<p class="text-sm font-label">Alex's iPhone</p>
+<p class="text-[11px] text-slate-silver">iPhone 15 Pro • Last used 2h ago</p>
+</div>
+</div>
+<button class="text-xs font-label text-primary-container hover:underline">Logout</button>
+</div>
+<div class="py-md flex justify-between items-center">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary-container p-2 bg-charcoal-input rounded">laptop_mac</span>
+<div>
+<p class="text-sm font-label">Work MacBook</p>
+<p class="text-[11px] text-slate-silver">MacBook Pro 14" • Last used 1d ago</p>
+</div>
+</div>
+<button class="text-xs font-label text-primary-container hover:underline">Logout</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Sidebar Actions & Billing -->
+<aside class="space-y-lg">
+<div class="bg-shadow-velvet border border-white/5 p-lg rounded-xl space-y-md">
+<h3 class="font-title text-title">Next Payment</h3>
+<div class="flex justify-between items-baseline">
+<span class="font-display text-[32px] text-on-surface">$14.99</span>
+<span class="font-label text-slate-silver">Due Nov 24</span>
+</div>
+<div class="flex items-center gap-sm p-sm bg-charcoal-input rounded-lg border border-white/5">
+<span class="material-symbols-outlined text-primary-container">credit_card</span>
+<span class="text-label font-body">•••• 8821</span>
+</div>
+<button class="w-full bg-primary-container hover:bg-inverse-primary text-white py-2.5 rounded-lg font-label text-sm transition-all font-bold">Manage Payment</button>
+<button class="w-full bg-charcoal-input hover:bg-surface-container-highest transition-colors text-slate-silver py-2 rounded-lg font-label text-sm border border-white/10">View Invoices</button>
+</div>
+<!-- Payment History -->
+<div class="bg-shadow-velvet border border-white/5 p-lg rounded-xl space-y-md">
+<h3 class="font-title text-sm uppercase tracking-widest text-slate-silver">Recent Invoices</h3>
+<div class="space-y-sm">
+<div class="flex justify-between items-center p-sm hover:bg-white/5 rounded-lg transition-colors cursor-pointer">
+<div>
+<p class="text-sm font-label">Oct 24, 2024</p>
+<span class="text-[10px] text-on-primary-container bg-primary-container/20 px-1.5 py-0.5 rounded">Paid</span>
+</div>
+<span class="font-title text-sm">$14.99</span>
+</div>
+<div class="flex justify-between items-center p-sm hover:bg-white/5 rounded-lg transition-colors cursor-pointer">
+<div>
+<p class="text-sm font-label">Sep 24, 2024</p>
+<span class="text-[10px] text-on-primary-container bg-primary-container/20 px-1.5 py-0.5 rounded">Paid</span>
+</div>
+<span class="font-title text-sm">$14.99</span>
+</div>
+<div class="flex justify-between items-center p-sm hover:bg-white/5 rounded-lg transition-colors cursor-pointer">
+<div>
+<p class="text-sm font-label">Aug 24, 2024</p>
+<span class="text-[10px] text-on-primary-container bg-primary-container/20 px-1.5 py-0.5 rounded">Paid</span>
+</div>
+<span class="font-title text-sm">$14.99</span>
+</div>
+</div>
+</div>
+</aside>
+</div>
+<!-- Upgrade Options Grid -->
+<section class="space-y-lg pt-xl">
+<div class="text-center space-y-sm">
+<h2 class="font-headline text-headline">Expand Your Universe</h2>
+<p class="font-body text-slate-silver max-w-2xl mx-auto">Choose a plan that fits your cinematic appetite. Upgrade or downgrade anytime.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- Basic -->
+<div class="bg-shadow-velvet border border-white/5 p-lg rounded-xl flex flex-col h-full crimson-halo transition-all duration-300">
+<span class="font-label text-xs text-slate-silver uppercase tracking-widest">Basic</span>
+<div class="my-md flex items-baseline gap-xs">
+<span class="text-3xl font-display">$7.99</span>
+<span class="text-xs text-slate-silver">/mo</span>
+</div>
+<ul class="space-y-sm flex-grow mb-xl">
+<li class="flex items-center gap-sm text-[13px] font-body text-slate-silver">
+<span class="material-symbols-outlined text-xs text-primary-container">check_circle</span> 720p HD Streaming
+                    </li>
+<li class="flex items-center gap-sm text-[13px] font-body text-slate-silver">
+<span class="material-symbols-outlined text-xs text-primary-container">check_circle</span> 1 Active Device
+                    </li>
+<li class="flex items-center gap-sm text-[13px] font-body text-slate-silver">
+<span class="material-symbols-outlined text-xs text-primary-container">check_circle</span> Limited Library
+                    </li>
+</ul>
+<button class="w-full py-3 bg-charcoal-input hover:bg-surface-container-highest transition-all font-label text-sm rounded-lg border border-white/10">Downgrade</button>
+</div>
+<!-- Standard -->
+<div class="bg-shadow-velvet border border-white/5 p-lg rounded-xl flex flex-col h-full crimson-halo transition-all duration-300">
+<span class="font-label text-xs text-slate-silver uppercase tracking-widest">Standard</span>
+<div class="my-md flex items-baseline gap-xs">
+<span class="text-3xl font-display">$11.99</span>
+<span class="text-xs text-slate-silver">/mo</span>
+</div>
+<ul class="space-y-sm flex-grow mb-xl">
+<li class="flex items-center gap-sm text-[13px] font-body text-slate-silver">
+<span class="material-symbols-outlined text-xs text-primary-container">check_circle</span> 1080p Full HD
+                    </li>
+<li class="flex items-center gap-sm text-[13px] font-body text-slate-silver">
+<span class="material-symbols-outlined text-xs text-primary-container">check_circle</span> 2 Active Devices
+                    </li>
+<li class="flex items-center gap-sm text-[13px] font-body text-slate-silver">
+<span class="material-symbols-outlined text-xs text-primary-container">check_circle</span> Ad-free experience
+                    </li>
+</ul>
+<button class="w-full py-3 bg-charcoal-input hover:bg-surface-container-highest transition-all font-label text-sm rounded-lg border border-white/10">Downgrade</button>
+</div>
+<!-- Premium (Current) -->
+<div class="bg-shadow-velvet border-2 border-primary-container p-lg rounded-xl flex flex-col h-full relative">
+<div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary-container px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter shadow-lg">Current</div>
+<span class="font-label text-xs text-primary-container uppercase tracking-widest font-bold">Premium</span>
+<div class="my-md flex items-baseline gap-xs">
+<span class="text-3xl font-display">$14.99</span>
+<span class="text-xs text-slate-silver">/mo</span>
+</div>
+<ul class="space-y-sm flex-grow mb-xl">
+<li class="flex items-center gap-sm text-[13px] font-body text-on-surface">
+<span class="material-symbols-outlined text-xs text-primary-container">check_circle</span> 4K UHD + HDR
+                    </li>
+<li class="flex items-center gap-sm text-[13px] font-body text-on-surface">
+<span class="material-symbols-outlined text-xs text-primary-container">check_circle</span> 4 Active Devices
+                    </li>
+<li class="flex items-center gap-sm text-[13px] font-body text-on-surface">
+<span class="material-symbols-outlined text-xs text-primary-container">check_circle</span> Dolby Atmos Audio
+                    </li>
+</ul>
+<button class="w-full py-3 bg-primary-container/10 text-primary-container/50 font-label text-sm rounded-lg border border-primary-container/20 cursor-not-allowed" disabled="">Active Plan</button>
+</div>
+<!-- Platinum (Recommended) -->
+<div class="bg-shadow-velvet border border-secondary-container p-lg rounded-xl flex flex-col h-full gold-glow relative crimson-halo transition-all duration-300">
+<div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter">Recommended</div>
+<span class="font-label text-xs text-secondary-container uppercase tracking-widest font-bold">Platinum</span>
+<div class="my-md flex items-baseline gap-xs">
+<span class="text-3xl font-display text-secondary-fixed">$19.99</span>
+<span class="text-xs text-slate-silver">/mo</span>
+</div>
+<ul class="space-y-sm flex-grow mb-xl">
+<li class="flex items-center gap-sm text-[13px] font-body text-on-surface">
+<span class="material-symbols-outlined text-xs text-secondary-container">stars</span> 8K Streaming + IMAX
+                    </li>
+<li class="flex items-center gap-sm text-[13px] font-body text-on-surface">
+<span class="material-symbols-outlined text-xs text-secondary-container">stars</span> 8 Active Devices
+                    </li>
+<li class="flex items-center gap-sm text-[13px] font-body text-on-surface">
+<span class="material-symbols-outlined text-xs text-secondary-container">stars</span> Unlimited Downloads
+                    </li>
+</ul>
+<button class="w-full py-3 bg-primary-container hover:bg-inverse-primary active:scale-95 transition-all text-white font-label text-sm rounded-lg font-bold shadow-xl">Upgrade Now</button>
+</div>
+</div>
+</section>
+<!-- FAQ Section -->
+<section class="bg-shadow-velvet border border-white/5 p-lg rounded-xl space-y-lg">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-md">
+<div>
+<h2 class="font-headline text-headline">Billing FAQ</h2>
+<p class="font-body text-slate-silver">Quick answers to common questions about your account.</p>
+</div>
+<button class="text-primary-container font-label text-sm flex items-center gap-2">
+                Visit Help Center <span class="material-symbols-outlined text-sm">open_in_new</span>
+</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-xl">
+<div class="space-y-2">
+<h4 class="font-title text-sm text-on-surface">Can I change my plan mid-month?</h4>
+<p class="text-[13px] text-slate-silver font-body">Yes. Upgrades take effect immediately and are pro-rated. Downgrades take effect at the start of your next billing cycle.</p>
+</div>
+<div class="space-y-2">
+<h4 class="font-title text-sm text-on-surface">How do I update my payment method?</h4>
+<p class="text-[13px] text-slate-silver font-body">Use the 'Manage Payment' button above to securely update your credit card or PayPal information.</p>
+</div>
+<div class="space-y-2">
+<h4 class="font-title text-sm text-on-surface">What devices support 4K UHD?</h4>
+<p class="text-[13px] text-slate-silver font-body">4K UHD requires a 4K-capable display, a stable 25Mbps+ connection, and a supported device like Apple TV 4K or Sony Bravia.</p>
+</div>
+<div class="space-y-2">
+<h4 class="font-title text-sm text-on-surface">Are there any hidden fees?</h4>
+<p class="text-[13px] text-slate-silver font-body">No. The monthly subscription fee includes all taxes and fees. Any additional costs like 'Early Access' tickets are separate purchases.</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-xl px-lg bg-surface-container-lowest border-t border-outline-variant/10 mt-xl">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-md">
+<div class="font-display text-title text-on-surface">FlickHQ</div>
+<div class="flex flex-wrap justify-center gap-md">
+<a class="font-body text-label text-slate-silver hover:text-primary-container transition-colors" href="#">Privacy Policy</a>
+<a class="font-body text-label text-slate-silver hover:text-primary-container transition-colors" href="#">Terms of Service</a>
+<a class="font-body text-label text-slate-silver hover:text-primary-container transition-colors" href="#">Help Center</a>
+<a class="font-body text-label text-slate-silver hover:text-primary-container transition-colors" href="#">Contact Us</a>
+</div>
+<p class="font-body text-label text-slate-silver">© 2024 FlickHQ Cinematic. All rights reserved.</p>
+</div>
+</footer>
+<script>
+    // Micro-interactions
+    document.querySelectorAll('.crimson-halo, .bg-shadow-velvet').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            const icon = card.querySelector('.material-symbols-outlined');
+            if(icon) icon.style.transition = 'transform 0.3s ease';
+            if(icon) icon.style.transform = 'translateY(-2px)';
+        });
+        card.addEventListener('mouseleave', () => {
+            const icon = card.querySelector('.material-symbols-outlined');
+            if(icon) icon.style.transform = 'translateY(0)';
+        });
+    });
+</script>
+</body></html>

@@ -1,27 +1,35 @@
 "use client";
 import React, { ReactNode, useState } from "react";
 import DataProvider from "@/app/context/DataContext";
-import ListProvider from "@/app/context/ListContext";
 import VaribalesProvider from "@/app/context/VariablesContext";
-import { AuthProvider } from "@/app/context/AuthContext";
+import AuthBootstrap from "@/app/_components/_client/auth/AuthBootstrap";
+import SubscriptionBootstrap from "@/app/_components/_client/subscription/SubscriptionBootstrap";
+import ListBootstrap from "@/app/_components/_client/lists/ListBootstrap";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import type { CurrentUserResponse } from "@/app/types/auth";
+import type { CurrentUserSubscriptionDto } from "@/app/types/subscriptions";
 
 type ClientLayoutProps = {
   children: ReactNode;
+  initialUser: CurrentUserResponse | null;
+  initialSubscription: CurrentUserSubscriptionDto | null;
 };
 
-export default function ClientLayout({ children }: ClientLayoutProps) {
+export default function ClientLayout({
+  children,
+  initialUser,
+  initialSubscription,
+}: ClientLayoutProps) {
   const [queryClient] = useState(() => new QueryClient());
   return (
     <>
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <VaribalesProvider>
-            <ListProvider>
-              <DataProvider>{children}</DataProvider>
-            </ListProvider>
-          </VaribalesProvider>
-        </AuthProvider>
+        <AuthBootstrap initialUser={initialUser} />
+        <SubscriptionBootstrap initialSubscription={initialSubscription} />
+        <ListBootstrap />
+        <VaribalesProvider>
+          <DataProvider>{children}</DataProvider>
+        </VaribalesProvider>
       </QueryClientProvider>
     </>
   );

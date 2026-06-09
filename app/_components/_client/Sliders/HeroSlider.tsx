@@ -1,18 +1,21 @@
 "use client";
 
-import React, { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectFade, Thumbs, Keyboard } from "swiper/modules";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaPlay, FaPlus } from "react-icons/fa";
+import { IoCheckmark } from "react-icons/io5";
 import { ShowType } from "@/app/types/websiteTypes";
+import type { MediaType } from "@/app/types/lists";
 import type { Swiper as SwiperType } from "swiper";
 
-import "swiper/css";
-import "swiper/css/effect-fade";
-import "swiper/css/thumbs";
 import { useVariables } from "@/app/context/VariablesContext";
+import { useAuthStore } from "@/app/_stores/authStore";
+import { useListStore } from "@/app/_stores/listStore";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function HeroSlider({
   movies,
@@ -22,12 +25,61 @@ export default function HeroSlider({
   shows: ShowType[];
 }) {
   const { trendingState, setTrendingState } = useVariables();
+  const router = useRouter();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isInWatchlist = useListStore((s) => s.isInWatchlist);
+  const addItem = useListStore((s) => s.addItem);
+  const removeItem = useListStore((s) => s.removeItem);
+  const watchlistId = useListStore((s) => s.getSystemList("watchlist")?.id);
+  const watchlistItems = useListStore((s) => s.getSystemList("watchlist")?.items);
+  const fetchListItems = useListStore((s) => s.fetchListItems);
+  const isInitialized = useListStore((s) => s.isInitialized);
 
   const data = trendingState === "movies" ? movies : shows;
 
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const progressRef = useRef<HTMLDivElement>(null);
+  const [watchlistLoading, setWatchlistLoading] = useState(false);
+
+  // Ensure watchlist items are loaded
+  const watchlistLoadedRef = useRef(false);
+  useEffect(() => {
+    if (isAuthenticated && isInitialized && watchlistId && !watchlistItems && !watchlistLoadedRef.current) {
+      watchlistLoadedRef.current = true;
+      fetchListItems(watchlistId, { perPage: 100 });
+    }
+  }, [isAuthenticated, isInitialized, watchlistId, watchlistItems, fetchListItems]);
+
+  const handleWatchlistToggle = useCallback(
+    async (movie: ShowType) => {
+      if (!isAuthenticated) {
+        toast.info("Sign in to use watchlist");
+        router.push("/signin");
+        return;
+      }
+      if (!watchlistId) {
+        toast.error("Watchlist not available");
+        return;
+      }
+
+      const mediaType = (movie.media_type || (movie.title ? "movie" : "tv")) as MediaType;
+
+      setWatchlistLoading(true);
+      const inList = isInWatchlist(movie.id);
+      if (inList) {
+        const success = await removeItem(watchlistId, mediaType, movie.id);
+        if (success) toast.success("Removed from watchlist");
+        else toast.error("Failed to remove from watchlist");
+      } else {
+        const success = await addItem(watchlistId, { mediaType, tmdbId: movie.id });
+        if (success) toast.success("Added to watchlist");
+        else toast.error("Failed to add to watchlist");
+      }
+      setWatchlistLoading(false);
+    },
+    [isAuthenticated, watchlistId, isInWatchlist, addItem, removeItem, router],
+  );
 
   const prefersReducedMotion =
     typeof window !== "undefined" &&
@@ -166,12 +218,36 @@ export default function HeroSlider({
                         </button>
 
                         <button
-                          className="group flex items-center gap-2 px-5 py-3 sm:px-6 sm:py-3.5 text-white font-medium hover:text-accent transition-colors min-h-[44px] rounded-md"
-                          aria-label={`Add ${movie.title || movie.name} to watchlist`}
+                          onClick={() => handleWatchlistToggle(movie)}
+                          disabled={watchlistLoading}
+                          className={`group flex items-center gap-2 px-5 py-3 sm:px-6 sm:py-3.5 font-medium transition-colors min-h-[44px] rounded-md disabled:opacity-60 ${
+                            isInWatchlist(movie.id)
+                              ? "text-accent hover:text-accent/80"
+                              : "text-white hover:text-accent"
+                          }`}
+                          aria-label={`${isInWatchlist(movie.id) ? "Remove from" : "Add to"} watchlist`}
                         >
-                          <FaPlus className="w-4 h-4 sm:w-5 sm:h-5" />
-                          <span className="hidden sm:inline">Watchlist</span>
-                          <span className="sm:hidden">List</span>
+                          {watchlistLoading ? (
+                            <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 border-current border-t-transparent animate-spin" />
+                          ) : isInWatchlist(movie.id) ? (
+                            <IoCheckmark className="w-4 h-4 sm:w-5 sm:h-5" />
+                          ) : (
+                            <FaPlus className="w-4 h-4 sm:w-5 sm:h-5" />
+                          )}
+                          <span className="hidden sm:inline">
+                            {watchlistLoading
+                              ? "..."
+                              : isInWatchlist(movie.id)
+                                ? "In Watchlist"
+                                : "Watchlist"}
+                          </span>
+                          <span className="sm:hidden">
+                            {watchlistLoading
+                              ? "..."
+                              : isInWatchlist(movie.id)
+                                ? "In List"
+                                : "List"}
+                          </span>
                         </button>
                       </motion.div>
                     </div>

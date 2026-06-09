@@ -2,11 +2,30 @@
 import Link from "next/link";
 import React from "react";
 import { PiSignIn, PiSignOut } from "react-icons/pi";
-import { useAuth } from "@/app/context/AuthContext";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { useAuthStore } from "@/app/_stores/authStore";
+import { logoutAction } from "@/app/_actions/auth";
 import Image from "next/image";
 
 export default function Signinbtn() {
-  const { isAuthenticated, user, logout } = useAuth();
+  const router = useRouter();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const user = useAuthStore((s) => s.user);
+  const clear = useAuthStore((s) => s.clear);
+
+  const handleLogout = async () => {
+    try {
+      await logoutAction();
+      clear();
+      toast.info("Signed out successfully");
+      router.push("/signin");
+      router.refresh();
+    } catch (error) {
+      console.error(error);
+      toast.error("Logout failed");
+    }
+  };
 
   if (isAuthenticated) {
     return (
@@ -15,17 +34,17 @@ export default function Signinbtn() {
           <div className="relative w-8 h-8 rounded-full overflow-hidden border border-white/10 group-hover:border-accent duration-300">
             <Image
               src={user?.avatar || "/website/avatar.jpg"}
-              alt={user?.name || "User"}
+              alt={user?.name || user?.email || "User"}
               fill
               className="object-cover"
             />
           </div>
           <span className="text-white text-sm font-medium max-lg:hidden group-hover:text-accent duration-300">
-            {user?.name}
+            {user?.name || user?.email}
           </span>
         </Link>
         <button
-          onClick={logout}
+          onClick={handleLogout}
           className="p-2 text-gray-400 hover:text-accent duration-300 transition-colors"
           title="Logout"
         >

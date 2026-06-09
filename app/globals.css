@@ -21,6 +21,11 @@
   --sec-text: #191e24;
   --info: #17a2b8;
   --purble: #6b56f9;
+
+  /* Animation tokens */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-fast: 200ms;
+  --transition-slow: 400ms;
 }
 
 @theme inline {
@@ -105,5 +110,40 @@ button {
   }
   50% {
     transform: rotate(5deg);
+  }
+}
+
+/* ── Skeleton Pulse ────────────────────────────── */
+@keyframes skeleton-pulse {
+  0% {
+    background-color: #0b0b0b;
+  }
+  50% {
+    background-color: #141414;
+  }
+  100% {
+    background-color: #0b0b0b;
+  }
+}
+
+/* ── Stripe Embedded Checkout Dark Theme ────────── */
+/* These styles are applied to the container of the Stripe iframe.
+   The iframe's internal content is themed server-side via
+   embedded_checkout.appearance.theme: 'night'. */
+stripe-embedded-checkout {
+  @apply block w-full;
+}
+
+/* Ensure the Stripe iframe has proper dark background and spacing */
+[data-stripe-embedded-checkout] {
+  @apply bg-transparent;
+  min-height: 400px;
+}
+
+/* ── Reduced Motion ────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse {
+    animation: none !important;
+    opacity: 0.4;
   }
 }

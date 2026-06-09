@@ -5,7 +5,7 @@ export function useFetchData<T>(api: string) {
   return useQuery({
     queryKey: [api],
     queryFn: async () => {
-      const response = await instance.get(api);
+      const response = await instance.get(`https://api.themoviedb.org/3${api}`);
       return response.data as T;
     },
     staleTime: 1000 * 60 * 5, // ❄️ الكاش يظل صالحًا لمدة 5 دقائق

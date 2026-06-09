@@ -1,14 +1,21 @@
 "use client";
 import React, { useEffect } from "react";
-import { FaBars, FaEye, FaHeart, FaHome, FaList, FaUser } from "react-icons/fa";
+import { FaBars, FaCreditCard, FaEye, FaHeart, FaHome, FaList, FaTag, FaUser } from "react-icons/fa";
 import Link from "next/link";
 import { MdLogout } from "react-icons/md";
 import { RxCross1 } from "react-icons/rx";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { useVariables } from "@/app/context/VariablesContext";
+import { useAuthStore } from "@/app/_stores/authStore";
+import { logoutAction } from "@/app/_actions/auth";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Sidebar() {
   const { showSidebar, setShowSidebar, width } = useVariables();
+  const router = useRouter();
+  const user = useAuthStore((s) => s.user);
+  const clear = useAuthStore((s) => s.clear);
   const iconStyle = "text-red-500";
   const profileOptions = [
     {
@@ -31,6 +38,16 @@ export default function Sidebar() {
       icon: <FaHeart className={`${iconStyle}`} />,
       link: "/profile/favouritlist",
     },
+    {
+      text: "Subscriptions",
+      icon: <FaTag className={`${iconStyle}`} />,
+      link: "/profile/subscriptions",
+    },
+    {
+      text: "Payment History",
+      icon: <FaCreditCard className={`${iconStyle}`} />,
+      link: "/profile/payments",
+    },
   ];
 
   useEffect(() => {
@@ -38,6 +55,19 @@ export default function Sidebar() {
       setShowSidebar(true);
     }
   }, [setShowSidebar, width]);
+
+  const handleLogout = async () => {
+    try {
+      await logoutAction();
+      clear();
+      toast.info("Signed out successfully");
+      router.push("/signin");
+      router.refresh();
+    } catch (error) {
+      console.error(error);
+      toast.error("Logout failed");
+    }
+  };
 
   const fadeInVariants = {
     hidden: {
@@ -80,16 +110,11 @@ export default function Sidebar() {
                 onClick={() => setShowSidebar(false)}
                 className="text-red-400  top-2 right-2 cursor-pointer size-6 w-fit ml-auto block lg:hidden"
               />
-              {/* Avatar */}
-              {/* <div className="lg:w-48 lg:h-48 w-32 h-32 mx-auto rounded-full flex items-center justify-center border-2 border-sky-400">
-                <Img
-                  src={user.imageUrl}
-                  className="w-full h-full rounded-full object-cover"
-                />
-              </div> */}
-              {/* <p className="my-2 text-white text-center">
-                {user.fullName || "No Name Found"}
-              </p> */}
+              {user && (
+                <p className="my-2 text-white text-center text-sm font-medium">
+                  {user.name || user.email}
+                </p>
+              )}
               <div className="flex flex-col w-full gap-4 mt-8">
                 {profileOptions.map((opation, index) => (
                   <Link
@@ -114,10 +139,13 @@ export default function Sidebar() {
                   <p className="text-red-400 hover:text-red-500">Home</p>
                   <FaHome className={`${iconStyle}`} />
                 </Link>
-                <div className=" cursor-pointer flex items-center justify-between w-full">
+                <button
+                  onClick={handleLogout}
+                  className="cursor-pointer flex items-center justify-between w-full"
+                >
                   <p className="text-red-400 hover:text-red-500">Log out</p>
                   <MdLogout className={`${iconStyle}`} />
-                </div>
+                </button>
               </div>
             </div>
           </motion.div>

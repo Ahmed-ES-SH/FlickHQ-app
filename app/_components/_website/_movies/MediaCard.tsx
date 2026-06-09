@@ -42,7 +42,7 @@ export default function MediaCard({
         delay: Math.min(index * 0.08, 0.4),
         ease: [0.16, 1, 0.3, 1],
       }}
-      className={`relative cursor-pointer group rounded-2xl overflow-hidden shadow-2xl transition-all duration-700 bg-panel_bg ${height}`}
+      className={`relative min-h-112.5 cursor-pointer group rounded-2xl overflow-hidden shadow-2xl transition-all duration-700 bg-panel_bg ${height}`}
       role="article"
       aria-label={`${mediaTitle} (${mediaYear})`}
       onMouseEnter={() => handleInteraction(true)}

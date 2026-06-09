@@ -1,5 +1,4 @@
 import { Dispatch, SetStateAction } from "react";
-import { ShowType } from "./websiteTypes";
 
 export interface gener {
   id: number | null;
@@ -33,39 +32,4 @@ export interface VariablesTypes {
   setShowSidebar: Dispatch<SetStateAction<boolean>>;
 }
 
-export interface ListContextType {
-  favoritesList: ShowType[];
-  setFavoritesList: Dispatch<SetStateAction<ShowType[]>>;
-  watchedList: ShowType[];
-  setWatchedList: Dispatch<SetStateAction<ShowType[]>>;
-  watchList: ShowType[];
-  setWatchList: Dispatch<SetStateAction<ShowType[]>>;
-  handleAddMedia: (
-    setList: Dispatch<SetStateAction<ShowType[]>>,
-    media: ShowType
-  ) => void;
-  handleDeleteMedia: (
-    setList: Dispatch<SetStateAction<ShowType[]>>,
-    media: ShowType
-  ) => void;
-  handleAddMediaToWatchedlist: (media: ShowType) => void;
-}
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  avatar?: string;
-}
-
-export interface AuthContextType {
-  user: User | null;
-  token: string | null;
-  isAuthenticated: boolean;
-  loading: boolean;
-  login: (data: any) => Promise<void>;
-  register: (data: any) => Promise<void>;
-  logout: () => void;
-  checkAuth: () => Promise<void>;
-}

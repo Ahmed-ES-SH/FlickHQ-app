@@ -1,5 +1,11 @@
 "use client";
-import React, { Dispatch, SetStateAction, useEffect, useState, useRef } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useState,
+  useRef,
+} from "react";
 import { motion } from "framer-motion";
 import Pagination from "../../_globalComponents/Pagination";
 import { ShowType } from "@/app/types/websiteTypes";
@@ -24,7 +30,7 @@ export default function ShowMovies() {
   const { currentCategory } = useVariables();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [currentApi, setCurrentApi] = useState<string>(
-    `${PopularMovies}page=1`
+    `${PopularMovies}page=1`,
   );
   const sectionRef = useRef<HTMLDivElement>(null);
 
@@ -63,8 +69,12 @@ export default function ShowMovies() {
   if (error)
     return (
       <div className="custom-container flex flex-col items-center justify-center min-h-[50vh] gap-4 p-6">
-        <p className="text-xl max-sm:text-lg font-semibold text-gray-400 text-center">Couldn't load movies</p>
-        <p className="text-sm max-sm:text-base text-gray-600 text-center">Something went wrong. Please try again.</p>
+        <p className="text-xl max-sm:text-lg font-semibold text-gray-400 text-center">
+          Couldn't load movies
+        </p>
+        <p className="text-sm max-sm:text-base text-gray-600 text-center">
+          Something went wrong. Please try again.
+        </p>
         <button
           onClick={() => window.location.reload()}
           className="px-6 py-3 max-sm:w-full bg-accent text-white rounded-md font-medium hover:bg-accent/90 transition-colors min-h-[44px]"
@@ -76,7 +86,7 @@ export default function ShowMovies() {
 
   if (isLoading)
     return (
-      <div className="custom-container grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 min-[2000px]:grid-cols-6 gap-6 min-h-[50vh]">
+      <div className="custom-container grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 min-[2000px]:grid-cols-6 gap-6 min-h-[50vh]">
         {[...Array(10)].map((_, i) => (
           <div
             key={i}
@@ -93,14 +103,14 @@ export default function ShowMovies() {
     );
 
   return (
-    <motion.div 
+    <motion.div
       ref={sectionRef}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       className="pb-20"
     >
-      <div className="custom-container grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 min-[2000px]:grid-cols-6 gap-6">
+      <div className="custom-container grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 min-[2000px]:grid-cols-6 gap-6">
         {data &&
           data.results.map((media: ShowType, index: number) => {
             const matchedGenres =
@@ -108,7 +118,7 @@ export default function ShowMovies() {
               media &&
               genres.filter(
                 (genre: gener) =>
-                  genre.id !== null && media.genre_ids.includes(genre.id)
+                  genre.id !== null && media.genre_ids.includes(genre.id),
               );
             return (
               <MediaCard

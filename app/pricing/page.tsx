@@ -1,67 +1,22 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
-import React, { useState } from "react";
-import { IoCheckmarkOutline } from "react-icons/io5";
-import { RxCross1 } from "react-icons/rx";
+
+import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
 import { TiBook } from "react-icons/ti";
 import { TbTicket } from "react-icons/tb";
 import { PiScreencastBold } from "react-icons/pi";
 import { CiVideoOn } from "react-icons/ci";
 import SwiperBartners from "@/app/_components/_website/_pricing/SwiperBartners";
+import { PricingCard } from "@/app/_components/_checkout/PricingCard";
+import PlansSkeleton from "@/app/_components/_globalComponents/PlansSkeleton";
+import { fetchPlansAction } from "@/app/_actions/plans";
+import type { PlanResponseDto, PriceResponseDto } from "@/app/types/subscriptions";
+import { BillingRecurringInterval, BillingPriceType } from "@/app/types/subscriptions";
 
-const plans = [
-  {
-    id: "regular",
-    title: "Regular",
-    priceMonthly: 11.99,
-    priceAnnual: 9.99,
-    description: "Essential streaming for casual viewers",
-    features: [
-      { name: "FlickHQ Originals", included: true },
-      { name: "Full streaming library", included: true },
-      { name: "Watch on 1 device", included: true },
-      { name: "HD (1080p) quality", included: true },
-      { name: "Cloud DVR storage", included: false },
-      { name: "Live TV channels", included: false },
-      { name: "Premium TV channels", included: false },
-    ],
-    popular: false,
-  },
-  {
-    id: "premium",
-    title: "Premium",
-    priceMonthly: 34.99,
-    priceAnnual: 29.99,
-    description: "The complete cinematic experience",
-    features: [
-      { name: "FlickHQ Originals", included: true },
-      { name: "Full streaming library", included: true },
-      { name: "Watch on 3 devices", included: true },
-      { name: "4K HDR + Dolby Atmos", included: true },
-      { name: "50hr Cloud DVR storage", included: true },
-      { name: "65+ Live TV channels", included: true },
-      { name: "Premium TV channels", included: false },
-    ],
-    popular: true,
-  },
-  {
-    id: "ultimate",
-    title: "Premium + TV",
-    priceMonthly: 49.99,
-    priceAnnual: 42.99,
-    description: "Everything, including premium channels",
-    features: [
-      { name: "FlickHQ Originals", included: true },
-      { name: "Full streaming library", included: true },
-      { name: "Watch on 5 devices", included: true },
-      { name: "4K HDR + Dolby Atmos", included: true },
-      { name: "100hr Cloud DVR storage", included: true },
-      { name: "65+ Live TV channels", included: true },
-      { name: "Premium TV channels", included: true },
-    ],
-    popular: false,
-  },
-];
+// ─── Feature Cards (static product features) ──────
 
 const featureCards = [
   {
@@ -90,158 +45,272 @@ const featureCards = [
   },
 ];
 
+// ─── Helpers ───────────────────────────────────────
+
+function formatInterval(interval: BillingRecurringInterval): string {
+  switch (interval) {
+    case BillingRecurringInterval.MONTH:
+      return "/mo";
+    case BillingRecurringInterval.YEAR:
+      return "/yr";
+    case BillingRecurringInterval.WEEK:
+      return "/wk";
+    case BillingRecurringInterval.DAY:
+      return "/day";
+    default:
+      return `/${interval}`;
+  }
+}
+
+/** Pick the first active recurring price matching the given interval. */
+function pickPrice(
+  prices: PriceResponseDto[],
+  interval: BillingRecurringInterval,
+): PriceResponseDto | undefined {
+  return prices.find(
+    (p) =>
+      p.active &&
+      p.type === BillingPriceType.RECURRING &&
+      p.interval === interval,
+  );
+}
+
+/** Calculate annual savings percentage from the first plan that has both prices. */
+function calculateSavings(plans: PlanResponseDto[]): number | null {
+  for (const plan of plans) {
+    const monthly = pickPrice(plan.prices, BillingRecurringInterval.MONTH);
+    const annual = pickPrice(plan.prices, BillingRecurringInterval.YEAR);
+    if (monthly && annual) {
+      const yearlyTotal = monthly.unitAmount * 12;
+      const saved = Math.round((1 - annual.unitAmount / yearlyTotal) * 100);
+      return saved > 0 ? saved : null;
+    }
+  }
+  return null;
+}
+
+// ─── Component ─────────────────────────────────────
+
 export default function Pricing() {
   const [isAnnual, setIsAnnual] = useState(false);
+  const [plans, setPlans] = useState<PlanResponseDto[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const prefersReducedMotion = useReducedMotion();
 
+  const loadPlans = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await fetchPlansAction();
+      if (result.success && result.data) {
+        setPlans(result.data);
+      } else {
+        setError(result.message || "Failed to load plans");
+      }
+    } catch {
+      setError("An unexpected error occurred while loading plans");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadPlans();
+  }, [loadPlans]);
+
+  // Sort plans by displayOrder once they're loaded
+  const sortedPlans = useMemo(
+    () => [...plans].sort((a, b) => a.displayOrder - b.displayOrder),
+    [plans],
+  );
+
+  // Calculate savings badge
+  const annualSavings = useMemo(() => calculateSavings(sortedPlans), [sortedPlans]);
+
+  // ── Render ─────────────────────────────────────
   return (
     <div className="lg:mt-28 mt-20 custom-container min-h-screen pb-20">
-      {/* Header */}
+      {/* ── Header ──────────────────────────────── */}
       <section className="mb-16">
-        <h1 className="text-white text-3xl xl:text-5xl font-bold mb-6">
-          Pricing plans
+        <h1 className="text-white text-3xl xl:text-5xl font-bold mb-4 text-balance">
+          Choose Your{" "}
+          <span className="relative inline-block">
+            Cinema Experience
+            <span
+              className="absolute -bottom-1 left-0 right-0 h-0.5 bg-accent rounded-full"
+              aria-hidden="true"
+            />
+          </span>
         </h1>
-        <p className="text-gray-400 text-base xl:text-lg xl:w-[75%] w-full leading-relaxed mb-4">
+        <p className="text-second_text text-base xl:text-lg leading-relaxed max-w-[75ch] mb-4 font-light">
           Stream thousands of movies, series, and exclusive originals in stunning
-          4K HDR. Choose the plan that fits your cinematic lifestyle — upgrade,
-          downgrade, or cancel anytime.
+          4K HDR. Select the plan that fits your lifestyle — upgrade, downgrade,
+          or cancel whenever you want.
         </p>
-        <p className="text-gray-500 text-sm xl:text-base xl:w-[65%] w-full leading-relaxed">
-          All plans include access to FlickHQ Originals, personalized
-          recommendations, and the ability to watch on your favorite devices.
+        <p className="text-light_text text-sm leading-relaxed max-w-[65ch] font-light">
+          All plans unlock FlickHQ Originals, personalized recommendations, and
+          seamless streaming across all your devices.
         </p>
       </section>
 
-      {/* Billing Toggle */}
+      {/* ── Feature Cards (static) ──────────────── */}
+      <section className="mb-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {featureCards.map((card) => (
+            <motion.div
+              key={card.title}
+              className="flex gap-5 p-6 rounded-lg bg-panel_bg border border-white/5 hover:border-white/10 hover:-translate-y-0.5 transition-all duration-200"
+              whileHover={
+                !prefersReducedMotion
+                  ? { y: -2 }
+                  : undefined
+              }
+              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <div className="shrink-0 mt-1">{card.icon}</div>
+              <div>
+                <h2 className="text-white text-lg font-semibold mb-2">
+                  {card.title}
+                </h2>
+                <p className="text-second_text text-sm leading-relaxed font-light max-w-[75ch]">
+                  {card.content}
+                </p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Billing Toggle ──────────────────────── */}
       <div className="flex items-center justify-center gap-4 mb-12">
         <span
-          className={`text-sm font-medium transition-colors ${
-            !isAnnual ? "text-white" : "text-gray-500"
+          className={`text-sm font-medium transition-colors duration-200 ${
+            !isAnnual ? "text-white" : "text-light_text"
           }`}
         >
           Monthly
         </span>
         <button
           onClick={() => setIsAnnual(!isAnnual)}
-          className={`relative w-14 h-7 rounded-full transition-colors ${
+          className={`relative w-14 h-7 rounded-full transition-colors duration-200 ${
             isAnnual ? "bg-accent" : "bg-[#2a2a2a]"
           }`}
-          aria-label={isAnnual ? "Switch to monthly billing" : "Switch to annual billing"}
+          aria-label={
+            isAnnual ? "Switch to monthly billing" : "Switch to annual billing"
+          }
         >
           <span
-            className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full transition-transform ${
+            className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full transition-transform duration-200 ${
               isAnnual ? "translate-x-7" : "translate-x-0"
             }`}
+            style={{ transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}
           />
         </button>
         <span
-          className={`text-sm font-medium transition-colors ${
-            isAnnual ? "text-white" : "text-gray-500"
+          className={`text-sm font-medium transition-colors duration-200 ${
+            isAnnual ? "text-white" : "text-light_text"
           }`}
         >
           Annual
         </span>
-        {isAnnual && (
-          <span className="text-xs font-semibold text-accent bg-accent/10 px-2.5 py-1 rounded-full">
-            Save 17%
-          </span>
-        )}
+        <AnimatePresence mode="wait">
+          {isAnnual && annualSavings && (
+            <motion.span
+              key="savings-badge"
+              initial={{ opacity: 0, scale: 0.8, x: -8 }}
+              animate={{ opacity: 1, scale: 1, x: 0 }}
+              exit={{ opacity: 0, scale: 0.8, x: -8 }}
+              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              className="text-xs font-semibold text-accent bg-accent/10 px-2.5 py-1 rounded-full"
+            >
+              Save {annualSavings}%
+            </motion.span>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* Feature Cards */}
+      {/* ── Pricing Cards (dynamic) ─────────────── */}
       <section className="mb-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {featureCards.map((card) => (
-            <div
-              key={card.title}
-              className="flex gap-5 p-6 rounded-lg bg-[#0f0f0f] border border-white/5 hover:border-white/10 transition-colors"
+        {loading ? (
+          <PlansSkeleton count={sortedPlans.length || 3} />
+        ) : error ? (
+          <div className="text-center py-12">
+            <p className="text-second_text text-lg mb-4 font-light">{error}</p>
+            <button
+              onClick={loadPlans}
+              className="bg-accent text-white px-7 py-3.5 rounded text-sm font-medium hover:bg-[#b80710] transition-all duration-200 min-h-[44px] touch-target focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-main_bg"
             >
-              <div className="shrink-0">{card.icon}</div>
-              <div>
-                <h2 className="text-white text-lg font-semibold mb-2">
-                  {card.title}
-                </h2>
-                <p className="text-gray-400 text-sm leading-relaxed">
-                  {card.content}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Pricing Cards */}
-      <section className="mb-20">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-          {plans.map((plan) => (
-            <div
-              key={plan.id}
-              className={`relative rounded-lg p-6 transition-all ${
-                plan.popular
-                  ? "bg-[#141414] border-2 border-accent"
-                  : "bg-[#0f0f0f] border border-white/5"
-              }`}
-            >
-              {plan.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-white text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap">
-                  Most Popular
-                </div>
-              )}
-
-              <div className="mb-6">
-                <h3 className="text-white text-lg font-semibold mb-1">
-                  {plan.title}
-                </h3>
-                <p className="text-gray-500 text-sm mb-4">
-                  {plan.description}
-                </p>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-white text-4xl font-bold">
-                    ${isAnnual ? plan.priceAnnual : plan.priceMonthly}
-                  </span>
-                  <span className="text-gray-500 text-sm">/month</span>
-                </div>
-                {isAnnual && (
-                  <p className="text-gray-600 text-xs mt-1">
-                    Billed annually (${(plan.priceAnnual * 12).toFixed(2)}/yr)
-                  </p>
-                )}
-              </div>
-
-              <ul className="space-y-3 mb-8">
-                {plan.features.map((feature) => (
-                  <li key={feature.name} className="flex items-start gap-3">
-                    {feature.included ? (
-                      <IoCheckmarkOutline className="size-5 text-accent shrink-0 mt-0.5" />
-                    ) : (
-                      <RxCross1 className="size-5 text-gray-600 shrink-0 mt-0.5" />
-                    )}
-                    <span
-                      className={`text-sm ${
-                        feature.included ? "text-gray-300" : "text-gray-600"
-                      }`}
-                    >
-                      {feature.name}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-
-              <button
-                className={`w-full py-3 rounded-md text-sm font-medium transition-colors ${
-                  plan.popular
-                    ? "bg-accent text-white hover:bg-accent/90"
-                    : "bg-[#1a1a1a] text-white hover:bg-[#222] border border-white/5"
-                }`}
-                aria-label={`Select ${plan.title} plan`}
+              Try Again
+            </button>
+          </div>
+        ) : sortedPlans.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-second_text text-lg font-light">No plans are currently available.</p>
+            <p className="text-light_text text-sm mt-2 font-light">
+              Please check back later for our subscription offerings.
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* Mobile: Swiper carousel */}
+            <div className="md:hidden -mx-2">
+              <Swiper
+                spaceBetween={16}
+                slidesPerView={1.15}
+                centeredSlides={false}
+                grabCursor
               >
-                Select {plan.title}
-              </button>
+                {sortedPlans.map((plan) => (
+                  <SwiperSlide key={plan.id}>
+                    <PricingCard
+                      plan={plan}
+                      activePrice={
+                        pickPrice(
+                          plan.prices,
+                          isAnnual
+                            ? BillingRecurringInterval.YEAR
+                            : BillingRecurringInterval.MONTH,
+                        ) ??
+                        (isAnnual
+                          ? pickPrice(plan.prices, BillingRecurringInterval.MONTH)
+                          : undefined)
+                      }
+                      isPopular={plan.highlight}
+                      isAnnual={isAnnual}
+                    />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
             </div>
-          ))}
-        </div>
+
+            {/* Tablet+: responsive grid */}
+            <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+              {sortedPlans.map((plan) => (
+                <PricingCard
+                  key={plan.id}
+                  plan={plan}
+                  activePrice={
+                    pickPrice(
+                      plan.prices,
+                      isAnnual
+                        ? BillingRecurringInterval.YEAR
+                        : BillingRecurringInterval.MONTH,
+                    ) ??
+                    (isAnnual
+                      ? pickPrice(plan.prices, BillingRecurringInterval.MONTH)
+                      : undefined)
+                  }
+                  isPopular={plan.highlight}
+                  isAnnual={isAnnual}
+                />
+              ))}
+            </div>
+          </>
+        )}
       </section>
 
-      {/* Partners */}
+      {/* ── Partners ────────────────────────────── */}
       <SwiperBartners />
     </div>
   );

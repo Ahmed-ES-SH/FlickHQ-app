@@ -9,19 +9,19 @@ import { ShowType } from "@/app/types/websiteTypes";
 import React from "react";
 
 export default async function page({ searchParams }: any) {
-  //movieId
+  //currentId
   const params = await searchParams;
-  const movieId = params?.currentId;
+  const { currentId } = await params;
 
   // CurrentMovie
   const movie: ShowType = await FetchData(
-    `/movie/${movieId}?language=en-US`,
+    `/movie/${currentId}?language=en-US`,
     false,
   );
 
   //similarMovies
   const { results: similarMovies } = await FetchData(
-    `/movie/${movieId}/similar`,
+    `/movie/${currentId}/similar`,
     false,
   );
 
@@ -38,7 +38,7 @@ export default async function page({ searchParams }: any) {
   );
 
   // Movie Trailer
-  const { results } = await FetchData(`/movie/${movieId}/videos`, false);
+  const { results } = await FetchData(`/movie/${currentId}/videos`, false);
   const trailer =
     results.find(
       (item: ShowType) =>
@@ -78,6 +78,8 @@ export default async function page({ searchParams }: any) {
             <MediaCommentsAndReviews
               data={upComingMovies}
               similarMovies={similarMovies}
+              media={movie}
+              disablePlaylist
             />
 
             <div className="order-first xl:order-none">

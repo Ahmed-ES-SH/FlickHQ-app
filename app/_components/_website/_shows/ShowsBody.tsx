@@ -99,7 +99,7 @@ export default function ShowsBody({
       {featuredShow && (
         <motion.section
           variants={itemVariants}
-          className="relative w-full h-[70vh] min-h-[500px] overflow-hidden"
+          className="relative w-full h-[70vh] min-h-125 overflow-hidden"
         >
           <div className="absolute inset-0">
             <Img
@@ -108,8 +108,8 @@ export default function ShowsBody({
               priority={true}
               loading="eager"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
+            <div className="absolute inset-0 bg-linear-to-t from-black via-black/60 to-transparent" />
+            <div className="absolute inset-0 bg-linear-to-r from-black/80 via-black/40 to-transparent" />
           </div>
 
           <div className="relative z-10 w-[95%] max-w-7xl mx-auto h-full flex flex-col justify-end pb-16 max-md:pb-10">
@@ -271,7 +271,7 @@ export default function ShowsBody({
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 xl:gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-4 gap-4 xl:gap-5">
               {Array.from({ length: 8 }).map((_, i) => (
                 <div
                   key={i}
@@ -315,7 +315,7 @@ export default function ShowsBody({
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5 gap-4 xl:gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-5 gap-4 xl:gap-5">
                 {shows.map((show: ShowType, index: number) => (
                   <MediaCard
                     index={index}

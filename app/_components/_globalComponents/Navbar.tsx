@@ -8,7 +8,7 @@ import ResponsiveSearchBar from "../_client/ResponsiveSearchBar";
 import Image from "next/image";
 import InputSearchData from "../_client/InputSearchData";
 import { navLinks } from "@/app/constants/website";
-import Signinbtn from "../_client/navbar/Signinbtn";
+import UserButton from "../_client/navbar/UserButton";
 
 export default function Navbar() {
   return (
@@ -66,7 +66,7 @@ export default function Navbar() {
               </div>
               <ResponsiveSearchBar />
             </div>
-            <Signinbtn />
+            <UserButton />
           </div>
         </div>
       </div>

@@ -1,4 +1,3 @@
-import React from "react";
 import FilterMoviesSection from "./FilterMoviesSection";
 import ShowMovies from "./ShowMovies";
 

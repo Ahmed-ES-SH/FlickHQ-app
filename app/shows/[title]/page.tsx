@@ -4,9 +4,9 @@ import FetchData from "@/app/hooks/FetchData";
 import React from "react";
 
 export default async function SingleShowPage({ searchParams }: any) {
-  const showId = searchParams?.currentId;
+  const { currentId } = await searchParams;
 
-  if (!showId) {
+  if (!currentId) {
     return (
       <div className="w-full min-h-screen flex items-center justify-center text-white mt-20">
         <p className="text-xl text-gray-400">Show not found.</p>
@@ -16,11 +16,11 @@ export default async function SingleShowPage({ searchParams }: any) {
 
   const [showRes, similarRes, reviewsRes] = await Promise.all([
     FetchData(
-      `/tv/${showId}?language=en-US&append_to_response=videos,credits,external_ids`,
-      false
+      `/tv/${currentId}?language=en-US&append_to_response=videos,credits,external_ids`,
+      false,
     ),
-    FetchData(`/tv/${showId}/similar?language=en-US&page=1`, true),
-    FetchData(`/tv/${showId}/reviews?language=en-US&page=1`, true),
+    FetchData(`/tv/${currentId}/similar?language=en-US&page=1`, true),
+    FetchData(`/tv/${currentId}/reviews?language=en-US&page=1`, true),
   ]);
 
   const showData = showRes;

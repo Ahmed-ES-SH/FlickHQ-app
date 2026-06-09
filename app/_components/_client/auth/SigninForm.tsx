@@ -7,13 +7,15 @@ import { VscLoading } from "react-icons/vsc";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import OtherMethods from "./OtherMethods";
-import { useAuth } from "@/app/context/AuthContext";
+import { loginAction } from "@/app/_actions/auth";
+import { useAuthStore } from "@/app/_stores/authStore";
 import Input from "./_form/Input";
 
 export default function SigninForm() {
   const router = useRouter();
-  const { login } = useAuth();
+  const setUser = useAuthStore((s) => s.setUser);
 
   const [form, setForm] = useState({
     email: "",
@@ -28,6 +30,7 @@ export default function SigninForm() {
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    setErrors((prev) => ({ ...prev, [e.target.name]: "" }));
   };
 
   const handleChangePasswordFieldType = () => {
@@ -35,36 +38,56 @@ export default function SigninForm() {
   };
 
   const validateForm = () => {
-    const errors: { email?: string; password?: string } = {};
+    const validationErrors: { email?: string; password?: string } = {};
 
     if (!form.email) {
-      errors.email = "The Email is Required .";
+      validationErrors.email = "The Email is Required .";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      errors.email = "Please, Enter Valid Email.";
+      validationErrors.email = "Please, Enter Valid Email.";
     }
 
     if (!form.password) {
-      errors.password = "The Password is Required .";
+      validationErrors.password = "The Password is Required .";
     }
 
     return {
-      errors,
-      isValid: Object.keys(errors).length === 0,
+      errors: validationErrors,
+      isValid: Object.keys(validationErrors).length === 0,
     };
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { errors, isValid } = validateForm();
+    const { errors: validationErrors, isValid } = validateForm();
     if (!isValid) {
-      setErrors(errors);
+      setErrors(validationErrors);
       return;
     }
     setIsSubmitting(true);
     try {
-      await login(form);
+      const res = await loginAction({
+        email: form.email,
+        password: form.password,
+      });
+
+      if (!res.success) {
+        if (res.field && res.field !== "general") {
+          setErrors((prev) => ({ ...prev, [res.field!]: res.message }));
+        } else {
+          toast.error(res.message);
+        }
+        return;
+      }
+
+      if (res.data?.user) {
+        setUser(res.data.user);
+      }
+      toast.success("Welcome back!");
+      router.push("/");
+      router.refresh();
     } catch (error) {
       console.error(error);
+      toast.error("An unexpected error occurred");
     } finally {
       setIsSubmitting(false);
     }
@@ -96,11 +119,10 @@ export default function SigninForm() {
     <>
       <form
         onSubmit={handleSubmit}
-        className="w-full flex flex-col gap-5 items-center"
+        className="w-full flex flex-col gap-4 sm:gap-5 items-center"
       >
         {inputs.map((input) => (
           <div key={input.name} className="w-full relative group">
-            <input.icon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-accent duration-300" />
             <Input
               onChange={onChange}
               name={input.name}
@@ -136,7 +158,7 @@ export default function SigninForm() {
           disabled={isSubmitting}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="relative bg-accent hover:bg-[#ff0a16] text-white px-6 py-4 w-full rounded-xl font-bold uppercase tracking-wider flex items-center justify-center gap-2 duration-300 shadow-lg shadow-accent/20 overflow-hidden group/btn disabled:opacity-70 disabled:cursor-not-allowed"
+          className="relative bg-accent hover:bg-[#ff0a16] text-white px-6 py-3 sm:py-4 w-full rounded-xl font-bold uppercase tracking-wider flex items-center justify-center gap-2 duration-300 shadow-lg shadow-accent/20 overflow-hidden group/btn disabled:opacity-70 disabled:cursor-not-allowed"
         >
           {/* Shimmer Effect */}
           <div className="absolute inset-0 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-1000 bg-linear-to-r from-transparent via-white/20 to-transparent" />
@@ -155,7 +177,7 @@ export default function SigninForm() {
       </form>
 
       {/* other methods*/}
-      <div className="w-full my-5 flex items-center gap-4 text-gray-500 text-xs uppercase tracking-widest font-bold">
+      <div className="w-full my-4 sm:my-5 flex items-center gap-4 text-gray-500 text-xs uppercase tracking-widest font-bold">
         <div className="h-[1px] flex-1 bg-white/10"></div>
         <span>or connect with</span>
         <div className="h-[1px] flex-1 bg-white/10"></div>

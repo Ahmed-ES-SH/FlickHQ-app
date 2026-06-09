@@ -1,4 +1,5 @@
 "use client";
+import { useState, useCallback } from "react";
 import { ShowType } from "@/app/types/websiteTypes";
 import { AnimatePresence, motion } from "framer-motion";
 import React from "react";
@@ -8,9 +9,13 @@ import { CiCalendarDate } from "react-icons/ci";
 import { TbChartBarPopular } from "react-icons/tb";
 import { gener } from "@/app/types/ContextType";
 import { useVariables } from "@/app/context/VariablesContext";
-import { useList } from "@/app/context/ListContext";
+import { useLocalListFallback } from "@/app/_helpers/localListFallback";
+import { useListStore } from "@/app/_stores/listStore";
+import { useAuthStore } from "@/app/_stores/authStore";
 import { useRouter } from "next/navigation";
 import { formatTitle } from "@/app/_helpers/helpers";
+import { toast } from "sonner";
+import type { MediaType } from "@/app/types/lists";
 
 interface props {
   currentSlide: ShowType;
@@ -21,21 +26,33 @@ type btntype = {
   bg_color: string;
   text: string;
   handle: () => void;
+  loading: boolean;
 };
 
 export default function CurrentSlideComponent({
   currentSlide,
   currentGenres,
 }: props) {
-  // Fetch status to determine any data will appear
   const { trendingState } = useVariables();
 
-  // Destructure list manipulation functions from the custom useList hook for adding media and updating watch lists
-  const { handleAddMedia, handleAddMediaToWatchedlist, setWatchList } =
-    useList();
+  // Store hooks (authenticated)
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isInWatchlist = useListStore((s) => s.isInWatchlist(currentSlide.id));
+  const isWatched = useListStore((s) => s.isWatched(currentSlide.id));
+  const addItem = useListStore((s) => s.addItem);
+  const removeItem = useListStore((s) => s.removeItem);
+  const watchlistId = useListStore((s) => s.getSystemList("watchlist")?.id);
+  const watchedId = useListStore((s) => s.getSystemList("watched")?.id);
 
-  // get useRouter
+  // Fallback to localStorage for unauthenticated users
+  const { addToWatchlist, markAsWatched } = useLocalListFallback();
+
   const router = useRouter();
+
+  const mediaType = (currentSlide.media_type !== "movie" ? "tv" : "movie") as MediaType;
+
+  const [watchlistLoading, setWatchlistLoading] = useState(false);
+  const [watchedLoading, setWatchedLoading] = useState(false);
 
   const handleGOToMedia = () => {
     router.push(
@@ -43,45 +60,124 @@ export default function CurrentSlideComponent({
         currentSlide.media_type != "movie" ? "shows" : "movies"
       }/${formatTitle(currentSlide.title || currentSlide.name)}?currentId=${
         currentSlide.id
-      }`
+      }`,
     );
   };
 
+  const handleWatchList = useCallback(async () => {
+    if (!isAuthenticated) {
+      addToWatchlist(currentSlide);
+      toast.info("Sign in to sync your watchlist");
+      return;
+    }
+    if (!watchlistId) {
+      toast.error("Watchlist not available");
+      return;
+    }
+
+    setWatchlistLoading(true);
+    if (isInWatchlist) {
+      const success = await removeItem(watchlistId, mediaType, currentSlide.id);
+      if (success) toast.success("Removed from watchlist");
+      else toast.error("Failed to remove");
+    } else {
+      const success = await addItem(watchlistId, {
+        mediaType,
+        tmdbId: currentSlide.id,
+      });
+      if (success) toast.success("Added to watchlist");
+      else toast.error("Failed to add");
+    }
+    setWatchlistLoading(false);
+  }, [
+    isAuthenticated,
+    watchlistId,
+    isInWatchlist,
+    currentSlide,
+    mediaType,
+    addItem,
+    removeItem,
+    addToWatchlist,
+  ]);
+
+  const handleWatched = useCallback(async () => {
+    if (!isAuthenticated) {
+      markAsWatched(currentSlide);
+      toast.info("Sign in to sync your watched list");
+      return;
+    }
+    if (!watchedId) {
+      toast.error("Watched list not available");
+      return;
+    }
+
+    setWatchedLoading(true);
+    if (isWatched) {
+      const success = await removeItem(watchedId, mediaType, currentSlide.id);
+      if (success) toast.success("Removed from watched");
+      else toast.error("Failed to remove");
+    } else {
+      const success = await addItem(watchedId, {
+        mediaType,
+        tmdbId: currentSlide.id,
+      });
+      if (success) toast.success("Marked as watched");
+      else toast.error("Failed to mark as watched");
+    }
+    setWatchedLoading(false);
+  }, [
+    isAuthenticated,
+    watchedId,
+    isWatched,
+    currentSlide,
+    mediaType,
+    addItem,
+    removeItem,
+    markAsWatched,
+  ]);
+
   const btns: btntype[] = [
     {
-      bg_color: "bg-yellow-400 ", // لون يدل على الحفظ أو الإضافة للقائمة
-      text: "Watch List",
-      handle: () => handleAddMedia(setWatchList, currentSlide),
+      bg_color: isInWatchlist ? "bg-accent" : "bg-yellow-400",
+      text: watchlistLoading
+        ? "..."
+        : isInWatchlist
+          ? "In Watchlist"
+          : "Watch List",
+      handle: handleWatchList,
+      loading: watchlistLoading,
     },
     {
-      bg_color: "bg-red-500 ", // لون يدل على الانتهاء أو المشاهدة
-      text: "Watched",
-      handle: () => handleAddMediaToWatchedlist(currentSlide),
+      bg_color: isWatched ? "bg-accent" : "bg-red-500",
+      text: watchedLoading ? "..." : isWatched ? "Watched ✓" : "Watched",
+      handle: handleWatched,
+      loading: watchedLoading,
     },
     {
-      bg_color: "bg-blue-600 ", // لون يدل على الحركة أو المتابعة
+      bg_color: "bg-blue-600",
       text: `Go to ${trendingState == "movies" ? "Movie" : "Show"}`,
       handle: () => handleGOToMedia(),
+      loading: false,
     },
   ];
 
   const mediaDetails = [
     {
-      icon: <CiCalendarDate className="text-primary_blue xl:size-6 size-5 " />,
+      icon: <CiCalendarDate className="text-primary_blue xl:size-6 size-5" />,
       value: new Date(
         currentSlide?.release_date ||
           currentSlide?.first_air_date ||
-          "2000-01-01"
+          "2000-01-01",
       ).getFullYear(),
     },
     {
       icon: (
-        <TbChartBarPopular className="text-primary_blue xl:size-6 size-5 " />
+        <TbChartBarPopular className="text-primary_blue xl:size-6 size-5" />
       ),
       value: Number(currentSlide?.popularity).toFixed(2),
     },
     {
-      icon: <FaLanguage className="text-primary_blue xl:size-6 size-5 " />,
+      icon: <FaLanguage className="text-primary_blue xl:size-6 size-5" />,
       value: currentSlide?.original_language,
     },
   ];
@@ -206,7 +302,9 @@ export default function CurrentSlideComponent({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 1.1 + index * 0.1 }}
-                className={`xl:py-3 xl:px-6 p-2 rounded-md whitespace-nowrap text-center ${btn.bg_color} text-white xl:first-letter:text-4xl first-letter:text-2xl xl:text-xl md:text-xl text-[15px] first-letter:text-black hover:bg-white hover:text-black hover:first-letter:text-secondery-green duration-300 cursor-pointer`}
+                className={`xl:py-3 xl:px-6 p-2 rounded-md whitespace-nowrap text-center ${btn.bg_color} text-white xl:first-letter:text-4xl first-letter:text-2xl xl:text-xl md:text-xl text-[15px] first-letter:text-black hover:bg-white hover:text-black hover:first-letter:text-secondery-green duration-300 cursor-pointer ${
+                  btn.loading ? "opacity-60 pointer-events-none" : ""
+                }`}
               >
                 {btn.text}
               </motion.div>
