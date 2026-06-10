@@ -70,7 +70,7 @@ describe("getServerAuthCookieHeader", () => {
 
 describe("setAuthCookie", () => {
   it("writes the cookie with the correct security options in non-production", async () => {
-    process.env.NODE_ENV = "test";
+    Object.assign(process.env, { NODE_ENV: "test" });
 
     await setAuthCookie("new-token");
 
@@ -89,14 +89,13 @@ describe("setAuthCookie", () => {
 
   it("uses sameSite='none' and secure=true in production", async () => {
     vi.resetModules();
-    process.env.NODE_ENV = "production";
-    const { setAuthCookie: setAuthCookieProd } = await import(
-      "@/app/_helpers/session"
-    );
+    Object.assign(process.env, { NODE_ENV: "production" });
+    const { setAuthCookie: setAuthCookieProd } =
+      await import("@/app/_helpers/session");
     await setAuthCookieProd("prod-token");
     const [, , options] = cookiesStore.set.mock.calls[0];
     expect(options).toMatchObject({ sameSite: "none", secure: true });
-    process.env.NODE_ENV = "test";
+    Object.assign(process.env, { NODE_ENV: "test" });
     vi.resetModules();
   });
 });
@@ -116,9 +115,8 @@ describe("cookie name resolution", () => {
     cookiesStore.get.mockImplementation((name: string) =>
       cookiesStore.store.get(name),
     );
-    const { getAuthCookie: getAuthCookieCustom } = await import(
-      "@/app/_helpers/session"
-    );
+    const { getAuthCookie: getAuthCookieCustom } =
+      await import("@/app/_helpers/session");
     const token = await getAuthCookieCustom();
     expect(token).toBe("tok");
     expect(cookiesStore.get).toHaveBeenCalledWith("custom_auth");
@@ -134,9 +132,8 @@ describe("cookie name resolution", () => {
     cookiesStore.get.mockImplementation((name: string) =>
       cookiesStore.store.get(name),
     );
-    const { getAuthCookie: getAuthCookieDefault } = await import(
-      "@/app/_helpers/session"
-    );
+    const { getAuthCookie: getAuthCookieDefault } =
+      await import("@/app/_helpers/session");
     const token = await getAuthCookieDefault();
     expect(token).toBe("fallback");
   });

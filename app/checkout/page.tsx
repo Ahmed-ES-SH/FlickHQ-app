@@ -1,13 +1,10 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef, Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { loadStripe } from "@stripe/stripe-js";
-import {
-  EmbeddedCheckoutProvider,
-  EmbeddedCheckout,
-} from "@stripe/react-stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
 import { motion } from "framer-motion";
 import { VscLoading } from "react-icons/vsc";
 import { IoCheckmarkCircle } from "react-icons/io5";
@@ -16,7 +13,6 @@ import { LuArrowLeft, LuTriangleAlert } from "react-icons/lu";
 import {
   fetchPlansAction,
   ensureBillingCustomerAction,
-  createEmbeddedCheckoutSessionAction,
 } from "@/app/_actions/plans";
 import type {
   PlanResponseDto,
@@ -28,6 +24,10 @@ import {
   CheckoutFormSkeleton,
   SummarySkeleton,
 } from "@/app/_components/_checkout/Skeleton";
+import { CustomCheckoutForm } from "@/app/_components/_checkout/CustomCheckoutForm";
+import { flickhqStripeAppearance } from "@/app/_components/_checkout/stripeAppearance";
+import { TestCardNotice } from "@/app/_components/_checkout/TestCardNotice";
+import { createElementsCheckoutSessionAction } from "@/app/_actions/checkout";
 
 // ─── Stripe Promise (cached at module level) ─────────
 
@@ -231,7 +231,6 @@ function OrderSummary({
 
 function CheckoutContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
 
   const priceId = searchParams.get("priceId");
 
@@ -292,11 +291,17 @@ function CheckoutContent() {
       }
       setPlan(match);
 
-      // Create embedded checkout session
-      // The backend sets the return_url server-side
-      const sessionResult = await createEmbeddedCheckoutSessionAction(pid, {
+      // Create Elements checkout session via NEW backend endpoint
+      console.log("[CheckoutContent] Calling createElementsCheckoutSessionAction", {
+        priceId: pid,
+        idempotencyKey: idempotencyKeyRef.current,
+      });
+
+      const sessionResult = await createElementsCheckoutSessionAction(pid, {
         idempotencyKey: idempotencyKeyRef.current!,
       });
+
+      console.log("[CheckoutContent] Session result:", sessionResult);
 
       if (!sessionResult.success) {
         if (sessionResult.statusCode === 409) {
@@ -313,8 +318,13 @@ function CheckoutContent() {
         setStatus("error");
         return;
       }
+      console.log("[CheckoutContent] Session created - raw data:", sessionResult.data);
       setClientSecret(sessionResult.data!.clientSecret);
-      setSessionId(sessionResult.data!.sessionId);
+      setSessionId(sessionResult.data!.sessionId ?? null);
+      console.log("[CheckoutContent] State update queued:", {
+        clientSecret: sessionResult.data!.clientSecret?.substring(0, 20) + "...",
+        sessionId: sessionResult.data!.sessionId,
+      });
       setStatus("ready");
     } catch (err) {
       setError(
@@ -334,18 +344,6 @@ function CheckoutContent() {
 
     loadCheckoutData(priceId);
   }, [priceId, loadCheckoutData]);
-
-  // ── Handle Stripe checkout complete ────────────
-  const handleComplete = useCallback(() => {
-    if (sessionId) {
-      try {
-        sessionStorage.setItem("checkout_session_id", sessionId);
-      } catch {
-        // sessionStorage may be unavailable
-      }
-      router.push(`/checkout/success?session_id=${sessionId}`);
-    }
-  }, [sessionId, router]);
 
   // ── Render ─────────────────────────────────────
   return (
@@ -393,12 +391,15 @@ function CheckoutContent() {
             {status === "ready" && clientSecret && (
               <div className="flex-1 min-h-[400px]">
                 {stripePromise ? (
-                  <EmbeddedCheckoutProvider
+                  <Elements
                     stripe={stripePromise}
-                    options={{ clientSecret, onComplete: handleComplete }}
+                    options={{
+                      clientSecret,
+                      appearance: flickhqStripeAppearance,
+                    }}
                   >
-                    <EmbeddedCheckout />
-                  </EmbeddedCheckoutProvider>
+                    <CustomCheckoutForm sessionId={sessionId} />
+                  </Elements>
                 ) : (
                   <ErrorState
                     error="Stripe is not configured. Please contact support."
@@ -425,6 +426,9 @@ function CheckoutContent() {
           </motion.div>
         </div>
       </div>
+
+      {/* Test Card Notice (only visible in dev/test mode) */}
+      <TestCardNotice />
     </div>
   );
 }

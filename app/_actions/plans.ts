@@ -319,6 +319,7 @@ type CheckoutBody = {
   successUrl?: string;
   cancelUrl?: string;
   metadata?: Record<string, string>;
+  uiMode: "hosted_page" | "embedded_page";
 };
 
 /** Merge `CheckoutOptions` with optional idempotency key. */

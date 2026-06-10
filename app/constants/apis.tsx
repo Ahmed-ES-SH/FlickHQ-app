@@ -53,6 +53,8 @@ export const API_ENDPOINTS = {
   BILLING: {
     checkoutSubscription: "/api/billing/checkout/subscription",
     checkoutOneTime: "/api/billing/checkout/one-time",
+    checkoutElements: "/api/billing/checkout/embedded-elements",
+    checkoutElementsOneTime: "/api/billing/checkout/embedded-elements-one-time",
     portalSession: "/api/billing/portal/session",
     customer: "/api/billing/customer",
   },

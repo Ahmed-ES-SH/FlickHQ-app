@@ -1,5 +1,4 @@
 "use client";
-import React from "react";
 import { motion } from "framer-motion";
 import Img from "@/app/_components/_globalComponents/Img";
 import SigninForm from "@/app/_components/_client/auth/SigninForm";

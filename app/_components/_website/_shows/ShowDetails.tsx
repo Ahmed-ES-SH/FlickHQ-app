@@ -3,7 +3,14 @@
 
 import React, { useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { FaPlay, FaHeart, FaShare, FaStar, FaRegHeart, FaRegEye } from "react-icons/fa";
+import {
+  FaPlay,
+  FaHeart,
+  FaShare,
+  FaStar,
+  FaRegHeart,
+  FaRegEye,
+} from "react-icons/fa";
 import { FiBookmark, FiMessageCircle } from "react-icons/fi";
 import Img from "@/app/_components/_globalComponents/Img";
 import MediaCard from "@/app/_components/_website/_movies/MediaCard";
@@ -34,15 +41,19 @@ const itemVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
   },
+  transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
 };
 
 export default function ShowDetails({ show, similarShows, reviews }: Props) {
   const router = useRouter();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const isFavorite = useListStore((s) => (show ? s.isFavorite(show.id) : false));
-  const isWatchlisted = useListStore((s) => (show ? s.isInWatchlist(show.id) : false));
+  const isFavorite = useListStore((s) =>
+    show ? s.isFavorite(show.id) : false,
+  );
+  const isWatchlisted = useListStore((s) =>
+    show ? s.isInWatchlist(show.id) : false,
+  );
   const isWatched = useListStore((s) => (show ? s.isWatched(show.id) : false));
   const addItem = useListStore((s) => s.addItem);
   const removeItem = useListStore((s) => s.removeItem);
@@ -76,7 +87,15 @@ export default function ShowDetails({ show, similarShows, reviews }: Props) {
       else toast.error("Failed to add");
     }
     setWlLoading(false);
-  }, [isAuthenticated, watchlistId, isWatchlisted, show, addItem, removeItem, router]);
+  }, [
+    isAuthenticated,
+    watchlistId,
+    isWatchlisted,
+    show,
+    addItem,
+    removeItem,
+    router,
+  ]);
 
   const handleToggleFavorite = useCallback(async () => {
     if (!isAuthenticated) {
@@ -97,7 +116,15 @@ export default function ShowDetails({ show, similarShows, reviews }: Props) {
       else toast.error("Failed to add");
     }
     setFavLoading(false);
-  }, [isAuthenticated, favoritesId, isFavorite, show, addItem, removeItem, router]);
+  }, [
+    isAuthenticated,
+    favoritesId,
+    isFavorite,
+    show,
+    addItem,
+    removeItem,
+    router,
+  ]);
 
   const handleToggleWatched = useCallback(async () => {
     if (!isAuthenticated) {
@@ -118,7 +145,15 @@ export default function ShowDetails({ show, similarShows, reviews }: Props) {
       else toast.error("Failed to mark as watched");
     }
     setWLoading(false);
-  }, [isAuthenticated, watchedId, isWatched, show, addItem, removeItem, router]);
+  }, [
+    isAuthenticated,
+    watchedId,
+    isWatched,
+    show,
+    addItem,
+    removeItem,
+    router,
+  ]);
 
   const showYear = new Date(show?.first_air_date).getFullYear();
   const seasonCount = show?.number_of_seasons || 0;
@@ -314,7 +349,11 @@ export default function ShowDetails({ show, similarShows, reviews }: Props) {
                   ) : (
                     <FiBookmark className="size-4" />
                   )}
-                  {wlLoading ? "..." : isWatchlisted ? "Watchlisted" : "Watchlist"}
+                  {wlLoading
+                    ? "..."
+                    : isWatchlisted
+                      ? "Watchlisted"
+                      : "Watchlist"}
                 </button>
                 <button
                   onClick={handleToggleWatched}

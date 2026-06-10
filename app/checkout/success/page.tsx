@@ -17,8 +17,9 @@ const POLL_INTERVAL_MS = 2000;
 
 function CheckoutSuccessContent() {
   const searchParams = useSearchParams();
-  const sessionId = searchParams.get("session_id");
+  const urlSessionId = searchParams.get("session_id");
 
+  const [sessionId, setSessionId] = useState<string | null>(urlSessionId);
   const [status, setStatus] = useState<
     "polling" | "confirmed" | "pending" | "error"
   >("polling");
@@ -30,38 +31,33 @@ function CheckoutSuccessContent() {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const attemptRef = useRef(0);
 
-  // Clean up sessionStorage on mount
+  // Recover sessionId from sessionStorage if not in URL
   useEffect(() => {
-    if (sessionId) {
+    if (!urlSessionId) {
       try {
-        sessionStorage.removeItem("checkout_session_id");
+        const stored = sessionStorage.getItem("checkout_session_id");
+        console.log("[CheckoutSuccess] sessionStorage fallback:", stored);
+        if (stored) {
+          setSessionId(stored);
+          sessionStorage.removeItem("checkout_session_id");
+        }
       } catch {
-        // sessionStorage may be unavailable
+        // sessionStorage unavailable
       }
     }
-  }, [sessionId]);
+  }, [urlSessionId]);
 
-  // Guard: no session_id in URL
-  useEffect(() => {
-    if (!sessionId) {
-      setStatus("error");
-      setMessage(
-        "Missing session identifier. Please contact support if you were charged.",
-      );
-    }
-  }, [sessionId]);
+  // Log what we have for debugging
+  console.log("[CheckoutSuccess] sessionId:", sessionId, "urlSessionId:", urlSessionId);
 
-  // Poll for subscription confirmation
+  // Poll for subscription confirmation (always runs regardless of sessionId)
   const poll = useCallback(async () => {
-    if (!sessionId) return;
-
     intervalRef.current = setInterval(async () => {
       attemptRef.current += 1;
 
       const result = await fetchCurrentSubscriptionAction();
 
       if (result.success && result.data) {
-        // Subscription found — confirmed!
         clearInterval(intervalRef.current!);
         intervalRef.current = null;
         setSubscription(result.data);
@@ -73,10 +69,17 @@ function CheckoutSuccessContent() {
       if (attemptRef.current >= MAX_POLL_ATTEMPTS) {
         clearInterval(intervalRef.current!);
         intervalRef.current = null;
-        setStatus("pending");
-        setMessage(
-          "We're still activating your subscription. This usually takes just a moment.",
-        );
+        if (sessionId) {
+          setStatus("pending");
+          setMessage(
+            "We're still activating your subscription. This usually takes just a moment.",
+          );
+        } else {
+          setStatus("error");
+          setMessage(
+            "Missing session identifier. Please contact support if you were charged.",
+          );
+        }
       }
     }, POLL_INTERVAL_MS);
   }, [sessionId]);

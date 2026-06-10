@@ -37,8 +37,8 @@ const itemVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
   },
+  transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
 };
 
 export default function ShowsBody({
@@ -64,6 +64,7 @@ export default function ShowsBody({
       );
 
       setShows(result?.data?.results || []);
+      //@ts-ignore
       setTotalPages(Math.min(result?.total_pages || 1, 500));
     } catch (error: any) {
       setError(error.message);

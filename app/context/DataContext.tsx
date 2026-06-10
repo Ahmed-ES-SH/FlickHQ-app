@@ -22,12 +22,8 @@ const DataProvider = ({ children }: Props) => {
 
   const { data: moviesGenres } = useFetchData<{ genres: gener[] }>(
     genersMovies,
-    false,
   );
-  const { data: showsGenres } = useFetchData<{ genres: gener[] }>(
-    genresShows,
-    false,
-  );
+  const { data: showsGenres } = useFetchData<{ genres: gener[] }>(genresShows);
 
   useEffect(() => {
     if (moviesGenres) {

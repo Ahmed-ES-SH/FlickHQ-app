@@ -18,18 +18,18 @@ export default defineConfig({
     setupFiles: ["./vitest.setup.ts"],
     include: ["**/*.test.{ts,tsx}"],
     css: false,
-  },
-  coverage: {
-    provider: "v8",
-    reporter: ["text", "html"],
-    include: [
-      "app/_stores/authStore.ts",
-      "app/_stores/listStore.ts",
-      "app/_actions/auth.ts",
-      "app/_actions/lists.ts",
-      "app/_helpers/session.ts",
-      "proxy.ts",
-    ],
-    exclude: ["**/*.test.ts", "**/*.test.tsx"],
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "html"],
+      include: [
+        "app/_stores/authStore.ts",
+        "app/_stores/listStore.ts",
+        "app/_actions/auth.ts",
+        "app/_actions/lists.ts",
+        "app/_helpers/session.ts",
+        "proxy.ts",
+      ],
+      exclude: ["**/*.test.ts", "**/*.test.tsx"],
+    },
   },
 });

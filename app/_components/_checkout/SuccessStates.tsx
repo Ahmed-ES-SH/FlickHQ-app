@@ -25,10 +25,7 @@ import { BillingRecurringInterval } from "@/app/types/subscriptions";
 
 // ─── Helpers (mirror from success page) ─────────────
 
-function formatAmount(
-  unitAmount: number,
-  currency: string = "USD",
-): string {
+function formatAmount(unitAmount: number, currency: string = "USD"): string {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency,
@@ -189,7 +186,9 @@ export function ConfirmedState({ subscription }: ConfirmedStateProps) {
           </div>
           {subscription.currentPeriodStart && subscription.currentPeriodEnd && (
             <div className="flex justify-between">
-              <span className="text-light_text text-sm font-medium">Period</span>
+              <span className="text-light_text text-sm font-medium">
+                Period
+              </span>
               <span className="text-white text-sm">
                 {formatPeriodLabel(
                   subscription.currentPeriodStart,
@@ -200,7 +199,9 @@ export function ConfirmedState({ subscription }: ConfirmedStateProps) {
           )}
           {subscription.trialEnd && (
             <div className="flex justify-between">
-              <span className="text-light_text text-sm font-medium">Trial ends</span>
+              <span className="text-light_text text-sm font-medium">
+                Trial ends
+              </span>
               <span className="text-white text-sm">
                 {new Date(subscription.trialEnd).toLocaleDateString("en-US", {
                   month: "long",
@@ -224,7 +225,7 @@ export function ConfirmedState({ subscription }: ConfirmedStateProps) {
             Start Watching
           </Link>
           <Link
-            href="/profile/subscriptions"
+            href="/userpanal/subscriptions"
             className="bg-[#1a1a1a] text-white px-7 py-3.5 rounded text-sm font-medium border border-white/5 hover:bg-[#222] hover:border-white/10 transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-main_bg"
           >
             Manage Subscription
@@ -298,11 +299,7 @@ export function PendingState({ message }: { message: string }) {
 
 // ─── State: Error ───────────────────────────────────
 
-export function SuccessErrorState({
-  message,
-}: {
-  message: string;
-}) {
+export function SuccessErrorState({ message }: { message: string }) {
   return (
     <CheckoutShell maxWidth="max-w-sm">
       <motion.div

@@ -23,8 +23,8 @@ const itemVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
   },
+  transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
 };
 
 const cardVariants = {
@@ -33,8 +33,8 @@ const cardVariants = {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
   },
+  transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
 };
 
 export default function page() {
@@ -72,10 +72,7 @@ export default function page() {
           </motion.div>
 
           {/* How It Works Cards */}
-          <motion.div
-            variants={containerVariants}
-            className="w-full mt-16"
-          >
+          <motion.div variants={containerVariants} className="w-full mt-16">
             <motion.h2
               variants={itemVariants}
               className="text-white text-2xl xl:text-4xl mb-12 font-bold"

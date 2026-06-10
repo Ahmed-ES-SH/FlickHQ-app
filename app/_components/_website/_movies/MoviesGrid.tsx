@@ -21,15 +21,15 @@ const containerVariants = {
 
 const itemVariants = {
   hidden: { opacity: 0, scale: 0.95, y: 10 },
-  show: { 
-    opacity: 1, 
-    scale: 1, 
-    y: 0, 
-    transition: { 
-      type: "spring", 
-      stiffness: 300, 
-      damping: 24 
-    } 
+  show: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+  },
+  transition: {
+    type: "spring",
+    stiffness: 300,
+    damping: 24,
   },
 };
 
@@ -45,11 +45,18 @@ export default function MoviesGrid({ movies, genres }: Props) {
     >
       {movies.map((show: ShowType, index: number) => {
         const matchedGenres =
-          genres && genres.filter((genre: gener) => show.genre_ids?.includes(genre.id as number));
+          genres &&
+          genres.filter((genre: gener) =>
+            show.genre_ids?.includes(genre.id as number),
+          );
 
         return (
           <motion.div key={show.id || index} variants={itemVariants}>
-            <MediaCard index={index} media={show} genres={matchedGenres || []} />
+            <MediaCard
+              index={index}
+              media={show}
+              genres={matchedGenres || []}
+            />
           </motion.div>
         );
       })}
