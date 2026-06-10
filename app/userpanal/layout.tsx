@@ -12,7 +12,7 @@ export default function UserPanelLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex w-full min-h-screen bg-main_bg pt-[72px]">
+    <div className="flex w-full min-h-screen bg-main_bg pt-18">
       <UserPanelSidebar />
       <main className="flex-1 min-w-0 ">
         <div className="w-full px-4 lg:px-8 py-6 lg:py-8">{children}</div>

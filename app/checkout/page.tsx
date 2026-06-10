@@ -99,10 +99,10 @@ function ErrorState({
         {error}
       </p>
 
-      <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs">
+      <div className="flex flex-col sm:flex-row gap-3 w-full max-w-md">
         {isConflict ? (
           <Link
-            href="/profile"
+            href="/userpanal/subscription"
             className="flex-1 bg-accent text-white px-7 py-3.5 rounded text-sm font-medium hover:bg-[#b80710] transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-main_bg text-center"
           >
             Manage Subscription
@@ -374,7 +374,10 @@ function CheckoutContent() {
 
             {/* Section header with crimson indicator */}
             <div className="flex items-center gap-2 mb-5">
-              <span className="w-1 h-5 bg-accent rounded-full" aria-hidden="true" />
+              <span
+                className="w-1 h-5 bg-accent rounded-full"
+                aria-hidden="true"
+              />
               <h2 className="text-lg font-bold text-white">Complete Payment</h2>
             </div>
 

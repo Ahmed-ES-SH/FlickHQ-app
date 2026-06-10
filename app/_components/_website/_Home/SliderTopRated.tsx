@@ -4,12 +4,12 @@ import React, { useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Swiper as SwiperType } from "swiper/types";
 import { Autoplay, FreeMode } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/free-mode";
 import SliderHeader from "../../_client/SliderHeader";
 import { useData } from "@/app/context/DataContext";
 import MediaCard from "../_movies/MediaCard";
 
+import "swiper/css";
+import "swiper/css/free-mode";
 interface props {
   data: ShowType[];
   dataType: "movies" | "shows";
@@ -32,7 +32,7 @@ export default function SliderTopRated({ data, dataType, bigTitle }: props) {
           autoplay={{
             delay: 5000,
             pauseOnMouseEnter: true,
-            disableOnInteraction: false
+            disableOnInteraction: false,
           }}
           grabCursor={true}
           freeMode={true}
@@ -50,11 +50,11 @@ export default function SliderTopRated({ data, dataType, bigTitle }: props) {
               spaceBetween: 24,
             },
             1024: {
-              slidesPerView: 4.2,
+              slidesPerView: 3.2,
               spaceBetween: 28,
             },
             1440: {
-              slidesPerView: 5.2,
+              slidesPerView: 4.2,
               spaceBetween: 32,
             },
           }}
@@ -71,11 +71,18 @@ export default function SliderTopRated({ data, dataType, bigTitle }: props) {
                 item &&
                 (dataType == "shows" ? genres_Shows : genres).filter(
                   (genre) =>
-                    genre.id !== null && item.genre_ids.includes(genre.id)
+                    genre.id !== null && item.genre_ids.includes(genre.id),
                 );
               return (
-                <SwiperSlide key={index} className="transition-transform duration-500 hover:z-50">
-                  <MediaCard media={item} index={index} genres={matchedGenres} />
+                <SwiperSlide
+                  key={index}
+                  className="transition-transform duration-500 hover:z-50"
+                >
+                  <MediaCard
+                    media={item}
+                    index={index}
+                    genres={matchedGenres}
+                  />
                 </SwiperSlide>
               );
             })}

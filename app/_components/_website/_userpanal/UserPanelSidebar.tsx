@@ -16,6 +16,7 @@ import {
   LuHeart,
   LuRadio,
   LuList,
+  LuMail,
 } from "react-icons/lu";
 import { useState, useEffect } from "react";
 import { useAuthStore } from "@/app/_stores/authStore";
@@ -31,6 +32,7 @@ const navItems = [
   { label: "Favorites", href: "/userpanal/favouritlist", icon: LuHeart },
   { label: "My Lists", href: "/userpanal/lists", icon: LuList },
   { label: "Subscription", href: "/userpanal/subscription", icon: LuRadio },
+  { label: "Contact Messages", href: "/userpanal/contact-messages", icon: LuMail },
 ];
 
 // ─── Component ─────────────────────────────────────
@@ -80,7 +82,7 @@ export default function UserPanelSidebar() {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed top-4 left-4 z-[100] text-white lg:hidden"
+          className="fixed bg-accent bottom-4 right-4 p-4 flex items-center justify-center rounded-full  z-100 text-white lg:hidden"
           aria-label="Open sidebar"
         >
           <LuMenu className="size-6" />
@@ -96,7 +98,7 @@ export default function UserPanelSidebar() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[98] bg-black/60 backdrop-blur-sm lg:hidden"
+                className="fixed inset-0 z-9999 bg-black/60 backdrop-blur-sm lg:hidden"
                 onClick={closeMobile}
               />
             )}
@@ -107,10 +109,8 @@ export default function UserPanelSidebar() {
               animate={isDesktop ? {} : { x: 0, opacity: 1 }}
               exit={{ x: -280, opacity: 0 }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              className={`fixed top-0 left-0 z-[99] h-screen w-[280px] bg-panel_bg border-r border-glass_border flex flex-col ${
-                isDesktop
-                  ? "lg:sticky lg:top-[72px] lg:h-[calc(100vh-72px)]"
-                  : ""
+              className={`fixed top-0 left-0 z-99999 h-screen w-70 bg-panel_bg border-r border-glass_border flex flex-col ${
+                isDesktop ? "lg:sticky lg:top-18 lg:h-[calc(100vh-72px)]" : ""
               }`}
             >
               {/* Close button (mobile) */}

@@ -337,10 +337,34 @@ import { useQuery } from "@tanstack/react-query";
 - Server components can use `globalRequest()` directly (it's `"use server"`)
 - Client components call server actions which use `globalRequest()` internally
 
+## Common Errors
+
+These are known pitfalls that occur frequently when working with this codebase.
+
+### `react-icons/lu` — Icon name doesn't exist in target module
+
+**Error:** `Export LuXxx doesn't exist in target module` when importing from `react-icons/lu`.
+
+**Cause:** The `react-icons/lu` package only exports icons that exist in the **Lucide** icon set. Not every intuitive icon name is available — for example `LuAlertCircle` does not exist, but `LuTriangleAlert` does.
+
+**Fix:** Always check which Lucide icon names are actually available by looking at existing usages in the codebase (grep for `from "react-icons/lu"`) or by checking the [Lucide icon catalog](https://lucide.dev/icons). If an icon isn't available in `react-icons/lu`, use a different icon set from `react-icons` (e.g., `Fa`, `Md`, `Tb`, `Bi`, `Ci`) or find the correct Lucide name.
+
+**Common available Lu icons used in this project:** `LuUser`, `LuMail`, `LuEye`, `LuHeart`, `LuBookmark`, `LuList`, `LuRadio`, `LuMenu`, `LuX`, `LuLoader`, `LuCheck`, `LuCheckCircle`, `LuTriangleAlert`, `LuClock`, `LuSend`, `LuArrowLeft`, `LuSearch`, `LuShield`, `LuLogOut`, `LuCreditCard`, `LuCrown`, `LuZap`, `LuCalendar`, `LuReceipt`, `LuExternalLink`, `LuInbox`, `LuMessageSquare`, `LuPencil`, `LuSave`, `LuCamera`, `LuRefreshCw`, `LuPlay`, `LuHistory`, `LuStar`, `LuDownload`, `LuBadgeCheck`, `LuTrash2`, `LuCopy`, `LuMoreHorizontal`.
+
+### framer-motion `Variants` type errors
+
+**Error:** `Type '{ hidden: ... }' is not assignable to type 'Variants'` (seen in `ShowsBody.tsx`, `about/page.tsx`, `Sidebar.tsx`, `MoviesGrid.tsx`).
+
+**Cause:** framer-motion expects the `transition.type` field to use the `AnimationGeneratorType` union type (e.g., `"spring"`, `"tween"`, `"keyframes"`), not a plain `string`. When you use `as const` or type the variants explicitly, this error surfaces.
+
+**Fix:** Use `as const` on the variants object or explicitly type `type` with the string literal. If not fixing the variants, suppress with a `// @ts-expect-error` and a reason comment.
+
+---
+
 ## Pre-existing Issues
 
 These are known issues in the codebase (not introduced by test work):
 
-- **framer-motion `Variants` type:** Some components (`ShowsBody.tsx`, `about/page.tsx`, `Sidebar.tsx`) have TypeScript errors with framer-motion variant definitions
+- **framer-motion `Variants` type:** Some components (`ShowsBody.tsx`, `about/page.tsx`, `Sidebar.tsx`) have TypeScript errors with framer-motion variant definitions. See Common Errors above.
 - **`useFetchData` arity:** `DataContext.tsx` has a TypeScript error due to mismatched function signature
 - **`pnpm lint`:** Fails because Next.js 16 removed the `next lint` command (needs ESLint CLI migration)

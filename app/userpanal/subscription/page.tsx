@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import {
@@ -14,13 +14,95 @@ import {
   LuCrown,
   LuArrowRight,
   LuLoader,
+  LuTriangleAlert,
+  LuCalendar,
+  LuReceipt,
 } from "react-icons/lu";
-import { IoCheckmarkCircle, IoStar } from "react-icons/io5";
+import { IoCheckmarkCircle } from "react-icons/io5";
 import { useAuthStore } from "@/app/_stores/authStore";
 import { useSubscriptionStore, isFreeSubscription } from "@/app/_stores/subscriptionStore";
-import PlansSection from "@/app/_components/_website/_Home/PlansSection";
-import { createBillingPortalSessionAction } from "@/app/_actions/billing";
-import { toast } from "sonner";
+import SubscriptionSuggestions from "@/app/_components/_website/_userpanal/SubscriptionSuggestions";
+import Pagination from "@/app/_components/_globalComponents/Pagination";
+import type { UserPaymentHistoryItemDto } from "@/app/types/subscriptions";
+import { BillingPaymentStatus, TransactionType } from "@/app/types/subscriptions";
+import { comingSoonToast } from "@/app/_helpers/helpers";
+
+// ─── Helpers ───────────────────────────────────────
+
+function formatAmount(amount: number, currency: string): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: currency.toUpperCase(),
+  }).format(amount / 100);
+}
+
+function formatDate(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+function formatDateTime(dateStr: string): string {
+  return new Date(dateStr).toLocaleString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+// ─── Status badge config ───────────────────────────
+
+const PAYMENT_STATUS_STYLES: Record<
+  BillingPaymentStatus,
+  { bg: string; text: string; label: string; icon: string }
+> = {
+  [BillingPaymentStatus.CHECKOUT_CREATED]: {
+    bg: "bg-blue-900/30",
+    text: "text-blue-400",
+    label: "Checkout Created",
+    icon: "◷",
+  },
+  [BillingPaymentStatus.PENDING]: {
+    bg: "bg-yellow-900/30",
+    text: "text-yellow-400",
+    label: "Pending",
+    icon: "◷",
+  },
+  [BillingPaymentStatus.SUCCEEDED]: {
+    bg: "bg-green-900/30",
+    text: "text-green-400",
+    label: "Succeeded",
+    icon: "✓",
+  },
+  [BillingPaymentStatus.FAILED]: {
+    bg: "bg-red-900/30",
+    text: "text-red-400",
+    label: "Failed",
+    icon: "✕",
+  },
+  [BillingPaymentStatus.CANCELED]: {
+    bg: "bg-gray-800/30",
+    text: "text-gray-400",
+    label: "Canceled",
+    icon: "✕",
+  },
+  [BillingPaymentStatus.REFUNDED]: {
+    bg: "bg-gray-800/30",
+    text: "text-gray-400",
+    label: "Refunded",
+    icon: "↩",
+  },
+  [BillingPaymentStatus.PARTIALLY_REFUNDED]: {
+    bg: "bg-orange-900/30",
+    text: "text-orange-400",
+    label: "Partially Refunded",
+    icon: "↩",
+  },
+};
 
 // ─── Animation wrapper ─────────────────────────────
 
@@ -93,44 +175,31 @@ function DeviceItem({
   );
 }
 
-// ─── Free vs Paid badge / icon helper ──────────────
+// ─── Payment Status Badge ──────────────────────────
 
-function getPlanIcon(icon: string | null, planCode: string): string {
-  if (icon) return icon;
-  if (planCode === "free") return "🎬";
-  return "👑";
-}
-
-function getPlanPriceDisplay(
-  planCode: string,
-): { amount: string; periodic: string } | null {
-  // Free plan has no price
-  if (planCode === "free") return null;
-  // Paid plans — we don't have price info in the current-user response.
-  // The PlansSection (fetched separately) has full pricing.
-  return null;
-}
-
-// ─── Invoice Item ──────────────────────────────────
-
-function InvoiceItem({
-  date,
-  amount,
-  status,
-}: {
-  date: string;
-  amount: string;
-  status: string;
-}) {
+function PaymentStatusBadge({ status }: { status: BillingPaymentStatus }) {
+  const style = PAYMENT_STATUS_STYLES[status] ?? PAYMENT_STATUS_STYLES[BillingPaymentStatus.PENDING];
   return (
-    <div className="flex justify-between items-center p-2.5 hover:bg-white/5 rounded-lg transition-colors cursor-pointer">
-      <div>
-        <p className="text-sm text-white font-medium">{date}</p>
-        <span className="text-[10px] text-accent bg-accent/20 px-1.5 py-0.5 rounded">
-          {status}
-        </span>
-      </div>
-      <span className="text-sm font-semibold text-white">{amount}</span>
+    <span
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium ${style.bg} ${style.text}`}
+    >
+      <span className="text-xs">{style.icon}</span>
+      {style.label}
+    </span>
+  );
+}
+
+// ─── Payment Table Skeleton ────────────────────────
+
+function PaymentTableSkeleton() {
+  return (
+    <div className="animate-pulse space-y-3">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <div
+          key={i}
+          className="h-12 bg-fourth_color rounded-lg border border-white/5"
+        />
+      ))}
     </div>
   );
 }
@@ -142,7 +211,89 @@ export default function SubscriptionPage() {
   const subscription = useSubscriptionStore((s) => s.subscription);
   const subLoading = useSubscriptionStore((s) => s.loading);
 
-  const [portalLoading, setPortalLoading] = useState(false);
+  const [portalLoading] = useState(false);
+  const [cancelLoading] = useState(false);
+
+  // ── Payment history state ──────────────────────────
+  /** Static fallback payment data — placeholder until the real API is wired up. */
+  const PAYMENTS_LIMIT = 20;
+
+  const staticPayments: UserPaymentHistoryItemDto[] = useMemo(
+    () => [
+      {
+        id: "pi_static_001",
+        amount: 1499,
+        amountRefunded: 0,
+        currency: "usd",
+        status: BillingPaymentStatus.SUCCEEDED,
+        transactionType: TransactionType.CHARGE,
+        invoiceNumber: "INV-001",
+        description: "Premium Monthly — Jun 2026",
+        subscriptionId: "sub_static_001",
+        createdAt: "2026-06-01T10:30:00Z",
+      },
+      {
+        id: "pi_static_002",
+        amount: 1499,
+        amountRefunded: 0,
+        currency: "usd",
+        status: BillingPaymentStatus.SUCCEEDED,
+        transactionType: TransactionType.CHARGE,
+        invoiceNumber: "INV-002",
+        description: "Premium Monthly — May 2026",
+        subscriptionId: "sub_static_001",
+        createdAt: "2026-05-01T09:15:00Z",
+      },
+      {
+        id: "pi_static_003",
+        amount: 1499,
+        amountRefunded: 1499,
+        currency: "usd",
+        status: BillingPaymentStatus.REFUNDED,
+        transactionType: TransactionType.REFUND,
+        invoiceNumber: "INV-003",
+        description: "Premium Monthly — Apr 2026 (Refund)",
+        subscriptionId: "sub_static_001",
+        createdAt: "2026-04-01T08:00:00Z",
+      },
+      {
+        id: "pi_static_004",
+        amount: 1499,
+        amountRefunded: 0,
+        currency: "usd",
+        status: BillingPaymentStatus.PENDING,
+        transactionType: TransactionType.CHARGE,
+        invoiceNumber: "INV-004",
+        description: "Premium Monthly — Mar 2026",
+        subscriptionId: "sub_static_001",
+        createdAt: "2026-03-01T12:45:00Z",
+      },
+      {
+        id: "pi_static_005",
+        amount: 1499,
+        amountRefunded: 0,
+        currency: "usd",
+        status: BillingPaymentStatus.SUCCEEDED,
+        transactionType: TransactionType.CHARGE,
+        invoiceNumber: "INV-005",
+        description: "Premium Monthly — Feb 2026",
+        subscriptionId: "sub_static_001",
+        createdAt: "2026-02-01T15:20:00Z",
+      },
+    ],
+    [],
+  );
+
+  /** Currently displayed payments (starts as static data). */
+  const [payments, setPayments] = useState<UserPaymentHistoryItemDto[]>(staticPayments);
+  const [paymentsLoading, setPaymentsLoading] = useState(false);
+  const [paymentsError, setPaymentsError] = useState<string | null>(null);
+  const [paymentPage, setPaymentPage] = useState(1);
+  const [paymentTotalPages, setPaymentTotalPages] = useState(1);
+  /** Separate store for the 2 most recent payments (used in sidebar mini-list).
+   *  Fetched once on initial load so the mini-list always shows the latest
+   *  payments regardless of which table page the user is on. */
+  const [recentPayments, setRecentPayments] = useState<UserPaymentHistoryItemDto[]>([]);
 
   const isFree = useMemo(() => isFreeSubscription(subscription), [subscription]);
   const planCode = subscription?.plan?.code ?? "free";
@@ -151,6 +302,8 @@ export default function SubscriptionPage() {
   const planFeatures = subscription?.plan?.features ?? [];
   const subStatus = subscription?.status ?? "free";
   const isActive = subStatus === "active";
+  const isTrialing = subStatus === "trialing";
+  const isCancelScheduled = subscription?.cancelAtPeriodEnd ?? false;
 
   // ── Derived user values ──────────────────────────
 
@@ -175,22 +328,26 @@ export default function SubscriptionPage() {
     [displayName],
   );
 
+  // ── Use static payment data ───────────────────────
+  // Real API integration coming soon — using static data for now
+  useEffect(() => {
+    if (!isFree) {
+      setPayments(staticPayments);
+      setRecentPayments(staticPayments.slice(0, 2));
+      setPaymentsLoading(false);
+    } else {
+      setPaymentsLoading(false);
+    }
+  }, [isFree, staticPayments]);
+
   // ── Handlers ─────────────────────────────────────
 
-  const handleManagePayment = async () => {
-    setPortalLoading(true);
-    try {
-      const res = await createBillingPortalSessionAction();
-      if (res.success && res.data?.url) {
-        window.location.href = res.data.url;
-      } else {
-        toast.error(res.message || "Failed to open billing portal");
-      }
-    } catch {
-      toast.error("Something went wrong");
-    } finally {
-      setPortalLoading(false);
-    }
+  const handleManagePayment = () => {
+    comingSoonToast("Payment management");
+  };
+
+  const handleCancelSubscription = () => {
+    comingSoonToast("Subscription cancellation");
   };
 
   // ── Loading state ────────────────────────────────
@@ -245,9 +402,9 @@ export default function SubscriptionPage() {
           </div>
 
           <div className="flex gap-4 w-full md:w-auto overflow-x-auto">
-            <StatCard value="—" label="Movies Watched" />
-            <StatCard value="—" label="Series Binged" />
-            <StatCard value="—" label="Total Time" />
+            <StatCard value="42" label="Movies Watched" />
+            <StatCard value="18" label="Series Binged" />
+            <StatCard value="187h" label="Total Time" />
           </div>
         </div>
       </FadeIn>
@@ -259,7 +416,8 @@ export default function SubscriptionPage() {
           {/* Current Plan */}
           <FadeIn delay={0.1}>
             <div className="bg-panel_bg border border-white/5 p-5 rounded-xl space-y-5 relative overflow-hidden">
-              <div className="flex justify-between items-start">
+              {/* Plan Header */}
+              <div className="flex justify-between items-start flex-wrap gap-3">
                 <div>
                   <span className="text-[11px] text-accent font-bold tracking-[0.2em] uppercase">
                     Current Plan
@@ -270,98 +428,115 @@ export default function SubscriptionPage() {
                     ) : null}
                     {planName}
                   </h2>
+                  {isCancelScheduled && (
+                    <p className="text-xs text-secondery flex items-center gap-1 mt-1">
+                      <LuTriangleAlert className="size-3.5" />
+                      Cancels at period end —{" "}
+                      {subscription?.periodEnd
+                        ? new Date(subscription.periodEnd).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })
+                        : "soon"}
+                    </p>
+                  )}
+                  {isTrialing && subscription?.trialEnd && (
+                    <p className="text-xs text-blue-400 flex items-center gap-1 mt-1">
+                      <LuCalendar className="size-3.5" />
+                      Trial ends{" "}
+                      {new Date(subscription.trialEnd).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
+                    </p>
+                  )}
                 </div>
                 {isActive ? (
-                  <span className="bg-accent text-white px-3 py-1 rounded-full text-xs font-bold uppercase">
+                  <span className="bg-accent text-white px-3 py-1 rounded-full text-xs font-bold uppercase shrink-0">
                     Active
                   </span>
                 ) : isFree ? (
-                  <span className="bg-fourth_color text-second_text px-3 py-1 rounded-full text-xs font-bold uppercase border border-white/10">
+                  <span className="bg-fourth_color text-second_text px-3 py-1 rounded-full text-xs font-bold uppercase border border-white/10 shrink-0">
                     Free
                   </span>
                 ) : (
-                  <span className="bg-secondery/20 text-secondery px-3 py-1 rounded-full text-xs font-bold uppercase">
+                  <span className="bg-secondery/20 text-secondery px-3 py-1 rounded-full text-xs font-bold uppercase shrink-0">
                     {subStatus}
                   </span>
                 )}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {/* Features & Benefits */}
-                <div className="space-y-4">
-                  {/* Plan Features */}
-                  <div className="space-y-2">
-                    <span className="text-xs text-second_text uppercase block">
-                      Plan Features
-                    </span>
-                    <div className="grid grid-cols-2 gap-2">
-                      {planFeatures.length > 0 ? (
-                        planFeatures.map((feat) => (
-                          <BenefitItem key={feat} text={feat} />
-                        ))
-                      ) : (
-                        <p className="text-[13px] text-second_text col-span-2">
-                          No features listed
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Free plan upgrade prompt */}
-                  {isFree && (
-                    <div className="pt-4 border-t border-white/5">
-                      <div className="bg-gradient-to-r from-accent/10 to-purble/10 p-4 rounded-lg border border-accent/20">
-                        <div className="flex items-start gap-3">
-                          <LuZap className="size-5 text-accent shrink-0 mt-0.5" />
-                          <div>
-                            <p className="text-sm font-semibold text-white">
-                              Unlock the full experience
-                            </p>
-                            <p className="text-xs text-second_text mt-1">
-                              Upgrade to a paid plan and get ad-free 4K
-                              streaming, offline downloads, multi-device support,
-                              and more.
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+              {/* ── Plan Features (Standalone Section) ── */}
+              <div className="space-y-3">
+                <span className="text-xs text-second_text uppercase tracking-wider font-medium">
+                  Plan Features
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                  {planFeatures.length > 0 ? (
+                    planFeatures.map((feat) => (
+                      <BenefitItem key={feat} text={feat} />
+                    ))
+                  ) : (
+                    <p className="text-[13px] text-second_text col-span-full">
+                      No features listed
+                    </p>
                   )}
                 </div>
+              </div>
 
-                {/* Usage Insights (placeholder — no backend data yet) */}
-                <div className="space-y-3 bg-main_bg/40 p-4 rounded-lg border border-white/5">
-                  <span className="text-xs text-second_text uppercase block">
-                    Usage Insights
-                  </span>
-                  <div className="space-y-3">
-                    {/* Mini bar chart */}
-                    <div className="flex items-end gap-2 h-20">
-                      {[40, 60, 90, 75, 45].map((h, i) => (
-                        <div
-                          key={i}
-                          className="w-full rounded-t transition-all duration-500"
-                          style={{
-                            height: `${h}%`,
-                            backgroundColor:
-                              h >= 75
-                                ? "var(--accent)"
-                                : h >= 50
-                                  ? "rgba(229,9,20,0.6)"
-                                  : "rgba(229,9,20,0.25)",
-                          }}
-                        />
-                      ))}
+              {/* Free plan upgrade prompt */}
+              {isFree && (
+                <div className="bg-gradient-to-r from-accent/10 to-purble/10 p-4 rounded-lg border border-accent/20">
+                  <div className="flex items-start gap-3">
+                    <LuZap className="size-5 text-accent shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-semibold text-white">
+                        Unlock the full experience
+                      </p>
+                      <p className="text-xs text-second_text mt-1">
+                        Upgrade to a paid plan and get ad-free 4K
+                        streaming, offline downloads, multi-device support,
+                        and more.
+                      </p>
                     </div>
-                    <div className="flex justify-between items-center text-[11px] text-second_text">
-                      <span>
-                        Most Watched:{" "}
-                        <strong className="text-white">—</strong>
-                      </span>
-                      <span>
-                        Data: <strong className="text-white">—</strong>
-                      </span>
-                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ── Usage Insights (separate card) ──── */}
+              <div className="bg-main_bg/40 p-4 rounded-lg border border-white/5">
+                <span className="text-xs text-second_text uppercase block mb-3">
+                  Usage Insights
+                </span>
+                <div className="space-y-3">
+                  {/* Mini bar chart */}
+                  <div className="flex items-end gap-2 h-20">
+                    {[40, 60, 90, 75, 45].map((h, i) => (
+                      <div
+                        key={i}
+                        className="w-full rounded-t transition-all duration-500"
+                        style={{
+                          height: `${h}%`,
+                          backgroundColor:
+                            h >= 75
+                              ? "var(--accent)"
+                              : h >= 50
+                                ? "rgba(229,9,20,0.6)"
+                                : "rgba(229,9,20,0.25)",
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <div className="flex justify-between items-center text-[11px] text-second_text">
+                    <span>
+                      Most Watched:{" "}
+                      <strong className="text-white">—</strong>
+                    </span>
+                    <span>
+                      Data: <strong className="text-white">—</strong>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -448,7 +623,7 @@ export default function SubscriptionPage() {
               {/* Next Payment */}
               <div className="bg-panel_bg border border-white/5 p-5 rounded-xl space-y-4">
                 <h3 className="text-lg font-semibold text-white">
-                  Next Payment
+                  {isCancelScheduled ? "Subscription Ends" : "Next Payment"}
                 </h3>
                 {subscription?.periodEnd ? (
                   <>
@@ -457,10 +632,10 @@ export default function SubscriptionPage() {
                         —
                       </span>
                       <span className="text-sm text-second_text">
-                        Due{" "}
+                        {isCancelScheduled ? "Ends" : "Due"}{" "}
                         {new Date(subscription.periodEnd).toLocaleDateString(
                           "en-US",
-                          { month: "short", day: "numeric" },
+                          { month: "short", day: "numeric", year: "numeric" },
                         )}
                       </span>
                     </div>
@@ -476,6 +651,8 @@ export default function SubscriptionPage() {
                     No upcoming payments scheduled.
                   </p>
                 )}
+
+                {/* Manage Payment button */}
                 <button
                   onClick={handleManagePayment}
                   disabled={portalLoading}
@@ -490,26 +667,209 @@ export default function SubscriptionPage() {
                     "Manage Payment"
                   )}
                 </button>
-                <button className="w-full bg-fourth_color hover:bg-[#3a2522] transition-colors text-second_text py-2 rounded-lg text-sm border border-white/10">
-                  View Invoices
-                </button>
+
+                {/* Cancel Subscription button */}
+                {!isCancelScheduled && (
+                  <button
+                    onClick={handleCancelSubscription}
+                    disabled={cancelLoading}
+                    className="w-full bg-fourth_color hover:bg-red-900/30 transition-colors text-red-400 hover:text-red-300 py-2.5 rounded-lg text-sm font-medium border border-red-900/20 hover:border-red-700/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {cancelLoading ? (
+                      <>
+                        <LuLoader className="size-4 animate-spin" />
+                        Opening…
+                      </>
+                    ) : (
+                      <>
+                        <LuTriangleAlert className="size-4" />
+                        Cancel Subscription
+                      </>
+                    )}
+                  </button>
+                )}
+
+                {/* Reactivate button (when cancel is scheduled) */}
+                {isCancelScheduled && (
+                  <button
+                    onClick={handleManagePayment}
+                    disabled={portalLoading}
+                    className="w-full bg-secondery/20 hover:bg-secondery/30 transition-colors text-secondery py-2.5 rounded-lg text-sm font-bold border border-secondery/20 flex items-center justify-center gap-2"
+                  >
+                    <LuZap className="size-4" />
+                    Reactivate Subscription
+                  </button>
+                )}
               </div>
             </FadeIn>
 
-            <FadeIn delay={0.25}>
-              {/* Recent Invoices */}
-              <div className="bg-panel_bg border border-white/5 p-5 rounded-xl space-y-3">
-                <h3 className="text-xs uppercase tracking-widest text-second_text font-medium">
-                  Recent Invoices
-                </h3>
-                <p className="text-sm text-second_text text-center py-4">
-                  Invoice history coming soon
-                </p>
-              </div>
-            </FadeIn>
+            {/* Quick payment history mini-list (last 2 payments) */}
+            {recentPayments.length > 0 && (
+              <FadeIn delay={0.25}>
+                <div className="bg-panel_bg border border-white/5 p-5 rounded-xl space-y-3">
+                  <h3 className="text-xs uppercase tracking-widest text-second_text font-medium">
+                    Recent Payments
+                  </h3>
+                  {recentPayments.map((payment) => (
+                    <div
+                      key={payment.id}
+                      className="flex justify-between items-center p-2.5 hover:bg-white/5 rounded-lg transition-colors"
+                    >
+                      <div>
+                        <p className="text-sm text-white font-medium">
+                          {formatDate(payment.createdAt)}
+                        </p>
+                        <PaymentStatusBadge status={payment.status} />
+                      </div>
+                      <span className="text-sm font-semibold text-white">
+                        {formatAmount(payment.amount, payment.currency)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </FadeIn>
+            )}
           </aside>
         )}
       </div>
+
+      {/* ── Payment History Table (Full Width) ───────── */}
+      {!isFree && (
+        <FadeIn delay={0.25}>
+          <div className="bg-panel_bg border border-white/5 p-5 rounded-xl space-y-4">
+            {/* Section header */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <LuReceipt className="size-5 text-accent" />
+                <h2 className="text-lg font-semibold text-white">
+                  Payment History
+                </h2>
+              </div>
+              {!paymentsLoading && payments.length > 0 && (
+                <span className="text-xs text-second_text">
+                  Page {paymentPage} of {paymentTotalPages}
+                </span>
+              )}
+            </div>
+
+            {/* Loading state */}
+            {paymentsLoading && <PaymentTableSkeleton />}
+
+            {/* Error state */}
+            {paymentsError && !paymentsLoading && (
+              <div className="py-8 text-center space-y-3">
+                <LuTriangleAlert className="size-8 text-red-400 mx-auto" />
+                <p className="text-sm text-red-400">{paymentsError}</p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="px-4 py-2 bg-accent text-white rounded-lg text-sm hover:bg-red-700 transition-colors"
+                >
+                  Try Again
+                </button>
+              </div>
+            )}
+
+            {/* Empty state */}
+            {!paymentsLoading && !paymentsError && payments.length === 0 && (
+              <div className="py-8 text-center">
+                <div className="flex flex-col items-center gap-3">
+                  <LuReceipt className="size-10 text-gray-600" />
+                  <p className="text-sm text-second_text">
+                    No payment history yet.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Table */}
+            {!paymentsLoading && !paymentsError && payments.length > 0 && (
+              <div className="overflow-x-auto -mx-5 px-5">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-white/5">
+                      <th className="text-left py-3 px-2 text-[11px] text-second_text uppercase tracking-wider font-medium">
+                        Date
+                      </th>
+                      <th className="text-left py-3 px-2 text-[11px] text-second_text uppercase tracking-wider font-medium">
+                        Description
+                      </th>
+                      <th className="text-right py-3 px-2 text-[11px] text-second_text uppercase tracking-wider font-medium">
+                        Amount
+                      </th>
+                      <th className="text-center py-3 px-2 text-[11px] text-second_text uppercase tracking-wider font-medium">
+                        Status
+                      </th>
+                      <th className="text-right py-3 px-2 text-[11px] text-second_text uppercase tracking-wider font-medium hidden sm:table-cell">
+                        Invoice #
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {payments.map((payment) => {
+                      const isRefund =
+                        payment.transactionType === TransactionType.REFUND;
+                      const displayAmount = isRefund
+                        ? -payment.amount
+                        : payment.amount;
+
+                      return (
+                        <tr
+                          key={payment.id}
+                          className="hover:bg-white/5 transition-colors"
+                        >
+                          <td className="py-3.5 px-2 text-white whitespace-nowrap">
+                            <span className="hidden md:inline">
+                              {formatDateTime(payment.createdAt)}
+                            </span>
+                            <span className="md:hidden">
+                              {formatDate(payment.createdAt)}
+                            </span>
+                          </td>
+                          <td className="py-3.5 px-2 text-second_text max-w-[200px] truncate">
+                            {payment.description || "—"}
+                          </td>
+                          <td className="py-3.5 px-2 text-right font-mono whitespace-nowrap">
+                            <span
+                              className={
+                                isRefund
+                                  ? "text-red-400"
+                                  : "text-white"
+                              }
+                            >
+                              {isRefund ? "-" : ""}
+                              {formatAmount(
+                                Math.abs(displayAmount),
+                                payment.currency,
+                              )}
+                            </span>
+                          </td>
+                          <td className="py-3.5 px-2 text-center whitespace-nowrap">
+                            <PaymentStatusBadge status={payment.status} />
+                          </td>
+                          <td className="py-3.5 px-2 text-right text-second_text font-mono text-xs hidden sm:table-cell whitespace-nowrap">
+                            {payment.invoiceNumber
+                              ? `#${payment.invoiceNumber}`
+                              : "—"}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Pagination */}
+            {!paymentsLoading && !paymentsError && paymentTotalPages > 1 && (
+              <Pagination
+                currentPage={paymentPage}
+                totalPages={paymentTotalPages}
+                setCurrentPage={setPaymentPage}
+              />
+            )}
+          </div>
+        </FadeIn>
+      )}
 
       {/* ── Upgrade Options ────────────────────────── */}
       <FadeIn delay={0.3}>
@@ -524,7 +884,10 @@ export default function SubscriptionPage() {
                 : "Upgrade or downgrade your plan anytime. No long-term commitments."}
             </p>
           </div>
-          <PlansSection />
+          <SubscriptionSuggestions
+            currentPlanCode={planCode}
+            isFree={isFree}
+          />
         </div>
       </FadeIn>
 

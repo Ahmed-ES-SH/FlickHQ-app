@@ -1,3 +1,13 @@
+import { toast } from "sonner";
+
+/** Shows a toast indicating a feature is coming soon.
+ *  Used as a placeholder until real backend integration is wired up. */
+export const comingSoonToast = (feature: string = "This feature") => {
+  toast.info("🔜 Coming soon", {
+    description: `${feature} will be available in a future update.`,
+  });
+};
+
 export const formatTitle = (title: string) =>
   title.toLowerCase().replace(/\s+/g, "-");
 

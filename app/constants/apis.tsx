@@ -56,6 +56,9 @@ export const API_ENDPOINTS = {
     portalSession: "/api/billing/portal/session",
     customer: "/api/billing/customer",
   },
+  CONTACT: {
+    submit: "/api/contact",
+  },
   USER: {
     list: "/api/user",
     stats: "/api/user/stats",

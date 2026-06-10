@@ -4,16 +4,24 @@ import Dropdown from "../_website/DropDown";
 import { BiDotsHorizontalRounded } from "react-icons/bi";
 import { opation_nav } from "@/app/constants/website";
 import { useClickOutside } from "@/app/hooks/useClickOutside";
+import { useAuthStore } from "@/app/_stores/authStore";
+
+const AUTH_LINKS = new Set(["Sign in", "Sign up", "Forgot password"]);
 
 export default function DotsNavbar() {
   const [showDrop, setShowDrop] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   useClickOutside(menuRef, () => setShowDrop(false));
 
   const handleToggle = () => {
     setShowDrop((prev) => !prev);
   };
+
+  const filteredOptions = isAuthenticated
+    ? opation_nav.filter((item) => !AUTH_LINKS.has(item.text))
+    : opation_nav;
 
   return (
     <div className="relative" ref={menuRef}>
@@ -28,7 +36,7 @@ export default function DotsNavbar() {
         setShowDrop={setShowDrop}
         dropState={showDrop}
         className="w-[180px] max-h-[240px] absolute top-10 overflow-y-auto p-2 rounded-md bg-[#141414] border border-white/5 text-white z-[999]"
-        opation={opation_nav}
+        opation={filteredOptions}
       />
     </div>
   );

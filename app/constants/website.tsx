@@ -9,7 +9,7 @@ import { FaStream } from "react-icons/fa";
 //navbar
 export const opation_nav = [
   { text: "About us", link: "/about" },
-  { text: "profile", link: "/profile" },
+  { text: "profile", link: "/userpanal" },
   { text: "Contactus", link: "/contactus" },
   { text: "Privacy policy", link: "/privacypolicy" },
   { text: "Sign in", link: "/signin" },

@@ -134,6 +134,7 @@ export default function PlansSection() {
   // ── Shared card renderer ──────────────────────
   const renderPlanCard = (plan: PlanResponseDto) => {
     const isPopular = plan.highlight;
+    const isFree = plan.code === "free";
     const activePrice = findMonthlyPrice(plan);
     const isExpanded = expandedPlans.has(plan.id);
 
@@ -278,7 +279,7 @@ export default function PlansSection() {
         </div>
 
         {/* Subscribe button — sticky at bottom */}
-        {activePrice ? (
+        {isFree ? null : activePrice ? (
           <div>
             <SubscribeButton
               priceId={activePrice.id}

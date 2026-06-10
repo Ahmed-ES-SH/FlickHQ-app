@@ -75,6 +75,22 @@ function pickPrice(
   );
 }
 
+/** Resolve the active price for a plan based on the billing cycle. */
+function resolvePrice(
+  prices: PriceResponseDto[],
+  isAnnual: boolean,
+): PriceResponseDto | undefined {
+  const preferred = isAnnual
+    ? pickPrice(prices, BillingRecurringInterval.YEAR)
+    : pickPrice(prices, BillingRecurringInterval.MONTH);
+  return (
+    preferred ??
+    (isAnnual
+      ? pickPrice(prices, BillingRecurringInterval.MONTH)
+      : undefined)
+  );
+}
+
 /** Calculate annual savings percentage from the first plan that has both prices. */
 function calculateSavings(plans: PlanResponseDto[]): number | null {
   for (const plan of plans) {
@@ -253,57 +269,54 @@ export default function Pricing() {
           </div>
         ) : (
           <>
-            {/* Mobile: Swiper carousel */}
-            <div className="md:hidden -mx-2">
+            {/* Very small mobile: Swiper carousel */}
+            <div className="sm:hidden -mx-2">
               <Swiper
                 spaceBetween={16}
-                slidesPerView={1.15}
+                slidesPerView={1.2}
                 centeredSlides={false}
                 grabCursor
               >
-                {sortedPlans.map((plan) => (
+                {sortedPlans.map((plan, index) => (
                   <SwiperSlide key={plan.id}>
                     <PricingCard
                       plan={plan}
-                      activePrice={
-                        pickPrice(
-                          plan.prices,
-                          isAnnual
-                            ? BillingRecurringInterval.YEAR
-                            : BillingRecurringInterval.MONTH,
-                        ) ??
-                        (isAnnual
-                          ? pickPrice(plan.prices, BillingRecurringInterval.MONTH)
-                          : undefined)
-                      }
+                      activePrice={resolvePrice(plan.prices, isAnnual)}
                       isPopular={plan.highlight}
                       isAnnual={isAnnual}
+                      tierIndex={index}
                     />
                   </SwiperSlide>
                 ))}
               </Swiper>
             </div>
 
-            {/* Tablet+: responsive grid */}
-            <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
-              {sortedPlans.map((plan) => (
+            {/* Tablet: 2×2 grid */}
+            <div className="hidden sm:grid lg:hidden grid-cols-2 gap-5">
+              {sortedPlans.map((plan, index) => (
                 <PricingCard
                   key={plan.id}
                   plan={plan}
-                  activePrice={
-                    pickPrice(
-                      plan.prices,
-                      isAnnual
-                        ? BillingRecurringInterval.YEAR
-                        : BillingRecurringInterval.MONTH,
-                    ) ??
-                    (isAnnual
-                      ? pickPrice(plan.prices, BillingRecurringInterval.MONTH)
-                      : undefined)
-                  }
+                  activePrice={resolvePrice(plan.prices, isAnnual)}
                   isPopular={plan.highlight}
                   isAnnual={isAnnual}
+                  tierIndex={index}
                 />
+              ))}
+            </div>
+
+            {/* Desktop: single row */}
+            <div className="hidden lg:flex lg:flex-row gap-5">
+              {sortedPlans.map((plan, index) => (
+                <div key={plan.id} className="flex-1 min-w-0">
+                  <PricingCard
+                    plan={plan}
+                    activePrice={resolvePrice(plan.prices, isAnnual)}
+                    isPopular={plan.highlight}
+                    isAnnual={isAnnual}
+                    tierIndex={index}
+                  />
+                </div>
               ))}
             </div>
           </>
