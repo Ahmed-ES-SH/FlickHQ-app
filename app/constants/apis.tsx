@@ -33,6 +33,7 @@ export const API_ENDPOINTS = {
     sendResetPassword: "/api/auth/reset-password/send",
     verifyResetToken: "/api/auth/reset-password/verify",
     resetPassword: "/api/auth/reset-password",
+    resendVerification: "/api/auth/resend-verification",
     google: "/api/auth/google",
     googleCallback: "/api/auth/google/callback",
     currentUser: "/api/auth/current-user",

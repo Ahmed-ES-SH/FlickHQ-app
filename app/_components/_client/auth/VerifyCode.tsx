@@ -20,8 +20,12 @@ export default function VerifyCode({ email }: VerifyCodeProps) {
     }
     setLoading(true);
     try {
-      const { sendResetPasswordAction } = await import("@/app/_actions/auth");
-      await sendResetPasswordAction(email);
+      const { resendVerificationAction } = await import("@/app/_actions/auth");
+      const res = await resendVerificationAction(email);
+      if (!res.success) {
+        toast.error(res.message);
+        return;
+      }
       setResent(true);
       toast.success("Verification email resent. Check your inbox.");
     } catch (error) {

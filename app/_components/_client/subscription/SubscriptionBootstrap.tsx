@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { useSubscriptionStore } from "@/app/_stores/subscriptionStore";
-import { fetchFullCurrentUserAction } from "@/app/_actions/auth";
+import { fetchCurrentUserAction } from "@/app/_actions/auth";
 import type { CurrentUserSubscriptionDto } from "@/app/types/subscriptions";
 
 interface SubscriptionBootstrapProps {
@@ -35,7 +35,7 @@ export default function SubscriptionBootstrap({
 
     (async () => {
       setLoading(true);
-      const res = await fetchFullCurrentUserAction();
+      const res = await fetchCurrentUserAction();
       if (cancelled) return;
 
       if (res.success && res.data) {

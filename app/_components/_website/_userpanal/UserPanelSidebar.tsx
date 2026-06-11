@@ -5,9 +5,6 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LuUser,
-  LuShield,
-  LuSettings,
-  LuCreditCard,
   LuLogOut,
   LuMenu,
   LuX,
@@ -30,9 +27,12 @@ const navItems = [
   { label: "Watched", href: "/userpanal/watched", icon: LuEye },
   { label: "Watchlist", href: "/userpanal/watchlist", icon: LuBookmark },
   { label: "Favorites", href: "/userpanal/favouritlist", icon: LuHeart },
-  { label: "My Lists", href: "/userpanal/lists", icon: LuList },
   { label: "Subscription", href: "/userpanal/subscription", icon: LuRadio },
-  { label: "Contact Messages", href: "/userpanal/contact-messages", icon: LuMail },
+  {
+    label: "Contact Messages",
+    href: "/userpanal/contact-messages",
+    icon: LuMail,
+  },
 ];
 
 // ─── Component ─────────────────────────────────────
