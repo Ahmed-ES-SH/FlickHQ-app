@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
-import { motion } from "framer-motion";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { FiAlertTriangle, FiHome, FiCompass } from "react-icons/fi";
 
 export default function NotFound() {

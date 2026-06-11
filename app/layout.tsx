@@ -9,6 +9,7 @@ import { globalRequest } from "./_helpers/globalRequest";
 import { API_ENDPOINTS } from "./constants/apis";
 import type { CurrentUserResponse } from "./types/auth";
 import type { CurrentUserSubscriptionDto } from "./types/subscriptions";
+import { getSharedMetadata } from "./_helpers/shared/SharedMetadata";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -23,10 +24,14 @@ const newsreader = Newsreader({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: "FlickHQ – Movies & TV Shows, Online cinema",
-  description: "FlickHQ – Movies & TV Shows, Online cinema",
-};
+export function generateMetadata(): Metadata {
+  const title = "FlickHQ – Movies & TV Shows, Online cinema";
+  const description = "FlickHQ – Movies & TV Shows, Online cinema";
+  return {
+    ...getSharedMetadata(title, description),
+    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
+  };
+}
 
 async function getInitialAuthData(): Promise<{
   user: CurrentUserResponse | null;

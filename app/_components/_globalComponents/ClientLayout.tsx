@@ -1,5 +1,5 @@
 "use client";
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, Suspense, useState } from "react";
 import DataProvider from "@/app/context/DataContext";
 import VaribalesProvider from "@/app/context/VariablesContext";
 import AuthBootstrap from "@/app/_components/_client/auth/AuthBootstrap";
@@ -24,8 +24,12 @@ export default function ClientLayout({
   return (
     <>
       <QueryClientProvider client={queryClient}>
-        <AuthBootstrap initialUser={initialUser} />
-        <SubscriptionBootstrap initialSubscription={initialSubscription} />
+        <Suspense fallback={null}>
+          <AuthBootstrap initialUser={initialUser} />
+        </Suspense>
+        <Suspense fallback={null}>
+          <SubscriptionBootstrap initialSubscription={initialSubscription} />
+        </Suspense>
         <ListBootstrap />
         <VaribalesProvider>
           <DataProvider>{children}</DataProvider>

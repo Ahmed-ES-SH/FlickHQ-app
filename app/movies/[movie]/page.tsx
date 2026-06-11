@@ -82,7 +82,7 @@ export default async function page({ searchParams }: any) {
               disablePlaylist
             />
 
-            <div className="order-first xl:order-none">
+            <div className="order-first xl:order-0">
               <MediaTrailer trailer={trailer} />
             </div>
           </div>

@@ -1,9 +1,25 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+// //////////////////////////////////////////////////////////////////////////////
+// Single Show Page — fetches show details, similar shows, and reviews ////////
+// //////////////////////////////////////////////////////////////////////////////
+
 import ShowDetails from "@/app/_components/_website/_shows/ShowDetails";
 import FetchData from "@/app/hooks/FetchData";
-import React from "react";
+import { getSharedMetadata } from "@/app/_helpers/shared/SharedMetadata";
+import type { ShowDetailsData, TMDBReview } from "@/app/types/shows";
+import type { ShowType } from "@/app/types/websiteTypes";
 
-export default async function SingleShowPage({ searchParams }: any) {
+export function generateMetadata() {
+  const title = "FlickHQ – Movies & TV Shows - TV Show Details";
+  const description =
+    "Explore detailed information about your favorite TV shows — cast, seasons, ratings, reviews, and similar recommendations on FlickHQ.";
+  return getSharedMetadata(title, description);
+}
+
+export default async function SingleShowPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ currentId?: string }>;
+}) {
   const { currentId } = await searchParams;
 
   if (!currentId) {
@@ -23,9 +39,9 @@ export default async function SingleShowPage({ searchParams }: any) {
     FetchData(`/tv/${currentId}/reviews?language=en-US&page=1`, true),
   ]);
 
-  const showData = showRes;
-  const similarShows = similarRes?.data?.results?.slice(0, 12) || [];
-  const reviews = reviewsRes?.data?.results?.slice(0, 6) || [];
+  const showData = showRes as unknown as ShowDetailsData;
+  const similarShows: ShowType[] = similarRes?.data?.results?.slice(0, 12) || [];
+  const reviews: TMDBReview[] = reviewsRes?.data?.results?.slice(0, 6) || [];
 
   return (
     <div className="w-full mt-20">

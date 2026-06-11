@@ -39,8 +39,21 @@ structure and architecture — nothing else.
    - All affected files.
    - All proposed changes and their reasons.
 2. **Do NOT begin execution until the user explicitly approves the plan.**
-3. Once approved, execute the full plan without asking for per-file confirmation.
-4. After execution, verify that no application behavior has changed.
+3. **use plannotator plgin for display the plan that ready to review and make sure display every plan in the browser by use plannotator**
+4. Once approved, execute the full plan without asking for per-file confirmation.
+5. After execution, verify that no application behavior has changed.
+
+---
+
+---
+
+## how write the comments
+
+1. the comments on the important code that need to explain
+2. comment must follow this pattern
+   //////////////////////////////////////////////////////////////////////////////
+   ///////// comment content ////////////////////////////////////////////////////
+   //////////////////////////////////////////////////////////////////////////////
 
 ---
 
@@ -73,8 +86,21 @@ export default async function Page() {
 
 ### Metadata
 
-- Every main page must have `metadata`.
-- Detail pages displaying a single item must use `generateMetadata`.
+- Every main page must have `generateMetadata` by use @app/\_helpers/shared/SharedMetadata.ts line next pattern.
+  ////\*\*\*
+
+  export function generateMetadata() {
+  const title = "FlickHQ – Movies & TV Shows - Login Page";
+  const description =
+  "Sign in to your FlickHQ account to watch movies and TV shows, continue watching, save your favorites, and access your personalized cinema experience.";
+
+  const sharedMetadata = getSharedMetadata(title, description);
+
+  return sharedMetadata;
+  }
+
+////\*\*\*
+
 - Shared metadata helpers may be used only when there is a genuine need.
 
 ### Suspense

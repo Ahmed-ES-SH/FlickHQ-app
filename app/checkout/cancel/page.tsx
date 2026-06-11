@@ -2,6 +2,14 @@
 import Link from "next/link";
 import { FaTimesCircle } from "react-icons/fa";
 import { CheckoutShell } from "@/app/_components/_checkout/CheckoutShell";
+import { getSharedMetadata } from "@/app/_helpers/shared/SharedMetadata";
+
+export function generateMetadata() {
+  const title = "FlickHQ – Movies & TV Shows - Checkout Canceled";
+  const description = "Your checkout was canceled. No charges have been made.";
+
+  return getSharedMetadata(title, description);
+}
 
 /**
  * Cancel page — shown after the user cancels the Stripe Checkout flow.
