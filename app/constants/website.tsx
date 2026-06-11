@@ -14,7 +14,7 @@ export const opation_nav = [
   { text: "Privacy policy", link: "/privacypolicy" },
   { text: "Sign in", link: "/signin" },
   { text: "Sign up", link: "/signup" },
-  { text: "Forgot password", link: "/forgetpassword" },
+  { text: "Forgot password", link: "/forget-password" },
   { text: "404 Page", link: "/not-found" },
 ];
 

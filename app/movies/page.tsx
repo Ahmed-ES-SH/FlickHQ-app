@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { Suspense } from "react";
+import { Suspense } from "react";
 import { genersMovies } from "../constants/apis";
 import MoviesGrid from "../_components/_website/_movies/MoviesGrid";
 import ServerPagination from "../_components/_globalComponents/ServerPagination";
@@ -7,41 +6,62 @@ import FetchData from "../hooks/FetchData";
 import MoviesPageHeader from "../_components/_website/_movies/MoviesPageHeader";
 import CategoryTabs from "../_components/_website/_movies/CategoryTabs";
 import GenreSidebar from "../_components/_website/_movies/GenreSidebar";
+import { buildMoviesEndpoint } from "../_helpers/movies/moviesHelpers";
+import { getSharedMetadata } from "../_helpers/shared/SharedMetadata";
+import type { MoviesSearchParams, MoviesPageData } from "../types/movies";
+import type { gener } from "../types/ContextType";
 
-export default async function page({ searchParams }: any) {
-  const { genres } = await FetchData(genersMovies, false);
-  const params = await searchParams; // Next.js 15 requires awaiting searchParams
+// //////////////////////////////////////////////////////////////////////////////
+// ///////// Metadata for the Movies page ///////////////////////////////////////
+// //////////////////////////////////////////////////////////////////////////////
+
+export function generateMetadata() {
+  const title = "FlickHQ – Movies & TV Shows - Movies Page";
+  const description =
+    "Browse 500+ pages of movies — filter by popular, top rated, now playing, and upcoming. Discover your next favorite film on FlickHQ.";
+
+  return getSharedMetadata(title, description);
+}
+
+// //////////////////////////////////////////////////////////////////////////////
+// ///////// Movies listing page — entry point only /////////////////////////////
+// //////////////////////////////////////////////////////////////////////////////
+
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<MoviesSearchParams>;
+}) {
+  const { genres } = (await FetchData(genersMovies, false)) as {
+    genres: gener[];
+  };
+
+  const params = await searchParams;
   const currentPage = Number(params?.page || 1);
   const currentCategory = params?.category || "popular";
   const currentGenre = params?.genre;
 
-  // Determine endpoint based on category and genre
-  let endpoint = `/movie/${currentCategory}?language=en-US&page=${currentPage}`;
+  const endpoint = buildMoviesEndpoint(currentCategory, currentPage, currentGenre);
 
-  if (currentGenre) {
-    let sortBy = "popularity.desc";
-    if (currentCategory === "top_rated") sortBy = "vote_average.desc";
-    if (currentCategory === "upcoming") sortBy = "primary_release_date.desc";
-    if (currentCategory === "now_playing") sortBy = "release_date.desc";
+  const { data, total_pages } = (await FetchData(endpoint, true)) as {
+    data: MoviesPageData;
+    total_pages: number;
+  };
 
-    endpoint = `/discover/movie?language=en-US&sort_by=${sortBy}&with_genres=${currentGenre}&page=${currentPage}`;
-  }
-
-  const { data, total_pages } = await FetchData(endpoint, true);
   const firstMovieBackdrop = data?.results?.[0]?.backdrop_path || null;
 
   return (
     <>
       <MoviesPageHeader backdropPath={firstMovieBackdrop} />
 
-      <Suspense fallback={<div className="h-10"></div>}>
+      <Suspense fallback={<div className="h-10" />}>
         <CategoryTabs />
       </Suspense>
 
       <div className="p-2 2xl:w-[94%] mx-auto mb-12 mt-6 flex flex-col lg:flex-row gap-8 lg:gap-10">
         {/* Sidebar for Genres */}
         <div className="w-full lg:w-64 shrink-0">
-          <Suspense fallback={<div className="h-10"></div>}>
+          <Suspense fallback={<div className="h-10" />}>
             <GenreSidebar genres={genres || []} />
           </Suspense>
         </div>
@@ -53,7 +73,7 @@ export default async function page({ searchParams }: any) {
           {total_pages > 1 && (
             <ServerPagination
               usedURL="/movies"
-              searchParams={params}
+              searchParams={params as Record<string, string>}
               currentPage={currentPage}
               totalPages={total_pages >= 500 ? 500 : total_pages}
             />

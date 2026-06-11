@@ -1,6 +1,15 @@
 "use client";
 import React, { useEffect } from "react";
-import { FaBars, FaCreditCard, FaEye, FaHeart, FaHome, FaList, FaTag, FaUser } from "react-icons/fa";
+import {
+  FaBars,
+  FaCreditCard,
+  FaEye,
+  FaHeart,
+  FaHome,
+  FaList,
+  FaTag,
+  FaUser,
+} from "react-icons/fa";
 import Link from "next/link";
 import { MdLogout } from "react-icons/md";
 import { RxCross1 } from "react-icons/rx";
@@ -77,14 +86,15 @@ export default function Sidebar() {
     visible: {
       opacity: 1,
       x: 0,
-      transition: {
-        duration: 0.5,
-        ease: "easeInOut",
-      },
     },
     exit: {
       opacity: 0,
       x: 20,
+    },
+
+    transition: {
+      duration: 0.5,
+      ease: "easeInOut",
     },
   };
 

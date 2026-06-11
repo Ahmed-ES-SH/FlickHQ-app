@@ -6,7 +6,6 @@ import {
   TopratedShows,
 } from "@/app/constants/apis";
 import FetchData from "@/app/hooks/FetchData";
-import React from "react";
 
 export default async function ShowsPage({ searchParams }: any) {
   const [genresRes, trendingRes, topRatedRes] = await Promise.all([

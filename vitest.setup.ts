@@ -1,6 +1,6 @@
 import { vi, beforeEach, afterEach } from "vitest";
 
-process.env.NODE_ENV = "test";
+Object.assign(process.env, { NODE_ENV: "test" });
 process.env.NEXT_PUBLIC_BACKEND_URL ??= "http://localhost:3000";
 process.env.NEXT_PUBLIC_AUTH_TOKEN ??= "flick_auth_token";
 

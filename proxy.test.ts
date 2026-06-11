@@ -1,12 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { NextRequest } from "next/server";
+import type { NextRequest, NextResponse } from "next/server";
 import { proxy, config } from "./proxy";
 
 vi.mock("next/server", () => {
   return {
     NextResponse: {
       redirect: (url: URL | string) => {
-        const u = typeof url === "string" ? new URL(url, "http://localhost") : url;
+        const u =
+          typeof url === "string" ? new URL(url, "http://localhost") : url;
         return new Response(null, {
           status: 307,
           headers: { location: u.toString() },

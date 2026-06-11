@@ -18,12 +18,33 @@ export default function AuthBootstrap({ initialUser }: AuthBootstrapProps) {
   const setUser = useAuthStore((s) => s.setUser);
   const setLoading = useAuthStore((s) => s.setLoading);
   const fullProfileFetched = useRef(false);
+  const fetchAttempted = useRef(false);
 
   // Hydrate store with initial auth data (CurrentUserResponse = { id, email, role })
   // The store's User type has all optional fields for this initial state.
   // Components using user.name/avatar already handle undefined gracefully.
   useEffect(() => {
     setUser(initialUser);
+
+    // SSR fallback: if SSR didn't find a user (e.g. OAuth redirect with SameSite
+    // cookie timing issue), try to fetch from client. The server action
+    // request includes cookies, so this succeeds even when SSR misses them.
+    if (!initialUser && !fetchAttempted.current) {
+      fetchAttempted.current = true;
+      fetchCurrentUserAction().then((res) => {
+        if (res.success && res.data) {
+          setUser(res.data);
+          if (res.data.id && !fullProfileFetched.current) {
+            fullProfileFetched.current = true;
+            fetchUserProfileAction(res.data.id).then((profile) => {
+              if (profile.success && profile.data) {
+                setUser({ ...res.data, ...profile.data });
+              }
+            });
+          }
+        }
+      });
+    }
 
     // If we have a basic auth profile, lazily fetch the full user profile
     // for name, avatar, and other details needed by the navbar.

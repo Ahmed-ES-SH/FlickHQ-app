@@ -1,0 +1,17 @@
+// //////////////////////////////////////////////////////////////////////////////
+// ///////// Movie page type definitions ///////////////////////////////////////
+// //////////////////////////////////////////////////////////////////////////////
+
+import type { ShowType } from "./websiteTypes";
+
+export interface MoviesSearchParams {
+  page?: string;
+  category?: string;
+  genre?: string;
+}
+
+export interface MoviesPageData {
+  results: ShowType[];
+  page: number;
+  total_pages: number;
+}
