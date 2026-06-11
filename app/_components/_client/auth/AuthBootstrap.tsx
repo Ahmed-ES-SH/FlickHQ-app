@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/app/_stores/authStore";
 import { fetchCurrentUserAction } from "@/app/_actions/auth";
 import { fetchUserProfileAction } from "@/app/_actions/user";
+import { toast } from "sonner";
 import type { CurrentUserResponse } from "@/app/types/auth";
 
 interface AuthBootstrapProps {
@@ -32,13 +33,13 @@ export default function AuthBootstrap({ initialUser }: AuthBootstrapProps) {
     if (!initialUser && !fetchAttempted.current) {
       fetchAttempted.current = true;
       fetchCurrentUserAction().then((res) => {
-        if (res.success && res.data) {
-          setUser(res.data);
-          if (res.data.id && !fullProfileFetched.current) {
+        if (res.success && res.data?.user) {
+          setUser(res.data.user);
+          if (res.data.user.id && !fullProfileFetched.current) {
             fullProfileFetched.current = true;
-            fetchUserProfileAction(res.data.id).then((profile) => {
+            fetchUserProfileAction(res.data.user.id).then((profile) => {
               if (profile.success && profile.data) {
-                setUser({ ...res.data, ...profile.data });
+                setUser({ ...res.data!.user, ...profile.data });
               }
             });
           }
@@ -59,6 +60,22 @@ export default function AuthBootstrap({ initialUser }: AuthBootstrapProps) {
     }
   }, [initialUser, setUser]);
 
+  // Handle ?error= from backend OAuth failure redirect
+  useEffect(() => {
+    const error = searchParams.get("error");
+    if (error) {
+      toast.error(
+        error === "access_denied"
+          ? "Google sign-in was cancelled."
+          : `Authentication failed: ${error.replace(/_/g, " ")}`,
+      );
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("error");
+      const query = params.toString();
+      router.replace(`/signin${query ? `?${query}` : ""}`);
+    }
+  }, [searchParams, router]);
+
   useEffect(() => {
     const refresh = searchParams.get("refresh");
     if (refresh !== "1") return;
@@ -70,15 +87,13 @@ export default function AuthBootstrap({ initialUser }: AuthBootstrapProps) {
       const res = await fetchCurrentUserAction();
       if (cancelled) return;
 
-      if (res.success && res.data) {
-        // res.data is CurrentUserResponse (id, email, role)
-        setUser(res.data);
+      if (res.success && res.data?.user) {
+        setUser(res.data.user);
 
-        // Also try to fetch full profile after OAuth callback
-        if (res.data.id) {
-          const profile = await fetchUserProfileAction(res.data.id);
+        if (res.data.user.id) {
+          const profile = await fetchUserProfileAction(res.data.user.id);
           if (!cancelled && profile.success && profile.data) {
-            setUser({ ...res.data, ...profile.data });
+            setUser({ ...res.data.user, ...profile.data });
           }
         }
 
@@ -88,10 +103,15 @@ export default function AuthBootstrap({ initialUser }: AuthBootstrapProps) {
         router.replace(query ? `${pathname}?${query}` : pathname);
       } else {
         setUser(null);
+        toast.error(
+          "Authentication failed. Please try signing in again.",
+        );
         const params = new URLSearchParams(searchParams.toString());
         params.delete("refresh");
         const query = params.toString();
-        router.replace(query ? `${pathname}?${query}` : pathname);
+        router.replace(
+          `/signin${query ? `?${query}` : ""}`,
+        );
       }
       setLoading(false);
     })();

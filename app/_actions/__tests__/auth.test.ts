@@ -33,8 +33,10 @@ import {
   verifyResetTokenAction,
   resetPasswordAction,
   fetchCurrentUserAction,
+  resendVerificationAction,
 } from "@/app/_actions/auth";
-import type { User, CurrentUserResponse } from "@/app/types/auth";
+import type { User } from "@/app/types/auth";
+import type { CurrentUserSubscriptionDto } from "@/app/types/subscriptions";
 
 const mockedGlobalRequest = vi.mocked(globalRequest);
 const mockedSetAuthCookie = vi.mocked(setAuthCookie);
@@ -54,10 +56,9 @@ const fakeUser: User = {
   updatedAt: "2024-01-01T00:00:00.000Z",
 };
 
-const currentUserResponse: CurrentUserResponse = {
-  id: 42,
-  email: "user@example.com",
-  role: "user",
+const currentUserResponseData = {
+  user: fakeUser,
+  subscription: null as CurrentUserSubscriptionDto | null,
 };
 
 function createMockResponse(
@@ -569,6 +570,7 @@ describe("verifyResetTokenAction", () => {
       endpoint: API_ENDPOINTS.AUTH.verifyResetToken,
       method: "POST",
       body: { token: "t", email: "e@e.com" },
+      authenticated: false,
       defaultErrorMessage: "Invalid or expired reset link",
     });
     expect(res.success).toBe(true);
@@ -613,6 +615,7 @@ describe("resetPasswordAction", () => {
       endpoint: API_ENDPOINTS.AUTH.resetPassword,
       method: "POST",
       body: { email: "e@e.com", token: "t", password: "newpw" },
+      authenticated: false,
       defaultErrorMessage: "Password reset failed",
     });
     expect(res.success).toBe(true);
@@ -639,11 +642,11 @@ describe("resetPasswordAction", () => {
    ======================================================================== */
 
 describe("fetchCurrentUserAction", () => {
-  it("GETs the endpoint and returns CurrentUserResponse on success", async () => {
+  it("GETs the endpoint and returns user + subscription on success", async () => {
     mockedGlobalRequest.mockResolvedValueOnce({
       success: true,
       message: "ok",
-      data: currentUserResponse,
+      data: currentUserResponseData,
       statusCode: 200,
     });
 
@@ -654,7 +657,9 @@ describe("fetchCurrentUserAction", () => {
       defaultErrorMessage: "Not authenticated",
     });
     expect(res.success).toBe(true);
-    expect(res.data).toEqual(currentUserResponse);
+    expect(res.data).toEqual(currentUserResponseData);
+    expect(res.data?.user).toEqual(fakeUser);
+    expect(res.data?.subscription).toBeNull();
   });
 
   it("returns default 'Not authenticated' on failure with no field", async () => {
@@ -669,5 +674,53 @@ describe("fetchCurrentUserAction", () => {
     expect(res.message).toBe("Not authenticated");
     expect(res.statusCode).toBe(401);
     expect(res.field).toBeUndefined();
+  });
+});
+
+/* ========================================================================
+   resendVerificationAction
+   ======================================================================== */
+
+describe("resendVerificationAction", () => {
+  it("POSTs email and returns success", async () => {
+    mockedGlobalRequest.mockResolvedValueOnce({
+      success: true,
+      message: "Verification email sent",
+      statusCode: 200,
+    });
+
+    const res = await resendVerificationAction("user@example.com");
+
+    expect(mockedGlobalRequest).toHaveBeenCalledWith({
+      endpoint: API_ENDPOINTS.AUTH.resendVerification,
+      method: "POST",
+      body: { email: "user@example.com" },
+      defaultErrorMessage: "Could not resend verification email",
+    });
+    expect(res.success).toBe(true);
+    expect(res.message).toBe("Verification email sent");
+  });
+
+  it("returns error on failure", async () => {
+    mockedGlobalRequest.mockResolvedValueOnce({
+      success: false,
+      message: "Rate limited",
+      statusCode: 429,
+    });
+
+    const res = await resendVerificationAction("user@example.com");
+    expect(res.success).toBe(false);
+    expect(res.message).toBe("Rate limited");
+    expect(res.statusCode).toBe(429);
+  });
+
+  it("returns default error message when no message is provided", async () => {
+    mockedGlobalRequest.mockResolvedValueOnce({
+      success: false,
+    });
+
+    const res = await resendVerificationAction("user@example.com");
+    expect(res.success).toBe(false);
+    expect(res.message).toBe("Could not resend verification email");
   });
 });

@@ -27,8 +27,4 @@ export interface LoginResponse {
 
 export interface RegisterResponse extends User {}
 
-export interface CurrentUserResponse {
-  id: number;
-  email: string;
-  role: UserRole;
-}
+export type CurrentUserResponse = User;
