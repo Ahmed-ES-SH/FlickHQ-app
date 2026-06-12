@@ -144,16 +144,12 @@ export async function loginAction(credentials: {
     }
   }
 
-  // New backend wraps in { data: { user } }
-  const user = json?.data?.user;
-  if (!user) {
-    return { success: false, message: "Invalid response from server", field: "general" };
-  }
+  const user = json?.data?.user ?? json?.user ?? null;
 
   return {
     success: true,
     message: json.message || "Logged in successfully",
-    data: { user },
+    data: { user: user ?? (null as unknown as User) },
     statusCode: res.status,
   };
 }

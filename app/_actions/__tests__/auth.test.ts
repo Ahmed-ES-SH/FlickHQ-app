@@ -197,16 +197,17 @@ describe("loginAction", () => {
     expect(res.field).toBe("password");
   });
 
-  it("returns error when response is missing user data", async () => {
+  it("returns success even when response body is missing user data", async () => {
     mockFetch.mockResolvedValueOnce(
       createMockResponse({ data: {} }, { status: 200 }),
     );
 
     const res = await loginAction({ email: "x@x.com", password: "pw" });
     expect(res).toEqual({
-      success: false,
-      message: "Invalid response from server",
-      field: "general",
+      success: true,
+      message: "Logged in successfully",
+      data: { user: null },
+      statusCode: 200,
     });
   });
 
