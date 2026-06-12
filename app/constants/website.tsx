@@ -1,7 +1,7 @@
 import { commentType, ReviewType } from "../types/websiteTypes";
 import { TiBook } from "react-icons/ti";
 import { TbTicket } from "react-icons/tb";
-import { PiScreencastBold, PiDownloadBold } from "react-icons/pi";
+import { LuMonitor, LuDownload } from "react-icons/lu";
 import { MdRecommend, MdOutlineDevicesOther } from "react-icons/md";
 import { RiParentFill } from "react-icons/ri";
 import { FaStream } from "react-icons/fa";
@@ -528,7 +528,7 @@ export const FeaturesCards = [
     title: "Interactive Events",
     content:
       "Experience films together with synchronized screenings, live community chats, and real-time polls during exclusive event windows.",
-    icon: <PiScreencastBold className={`${iconStyle}`} />,
+    icon: <LuMonitor className={`${iconStyle}`} />,
   },
   {
     title: "Lossless Streaming",
@@ -546,7 +546,7 @@ export const FeaturesCards = [
     title: "Universal Offline",
     content:
       "Take your cinema with you. Download any title in full quality and watch anywhere, from transcontinental flights to remote getaways.",
-    icon: <PiDownloadBold className={`${iconStyle}`} />,
+    icon: <LuDownload className={`${iconStyle}`} />,
   },
   {
     title: "Pro Parental Suite",

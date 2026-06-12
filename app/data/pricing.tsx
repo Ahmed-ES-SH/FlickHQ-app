@@ -5,7 +5,7 @@
 import type { ReactNode } from "react";
 import { TiBook } from "react-icons/ti";
 import { TbTicket } from "react-icons/tb";
-import { PiScreencastBold } from "react-icons/pi";
+import { LuMonitor } from "react-icons/lu";
 import { CiVideoOn } from "react-icons/ci";
 
 export interface FeatureCardData {
@@ -35,7 +35,7 @@ export const featureCards: FeatureCardData[] = [
     title: "Interactive Screenings",
     content:
       "Watch together with synchronized playback, live chat, and real-time reactions. Host watch parties, vote on what to play next, and turn movie night into a shared experience.",
-    icon: <PiScreencastBold className="size-10 text-accent" />,
+    icon: <LuMonitor className="size-10 text-accent" />,
   },
   {
     title: "Behind the Scenes",
