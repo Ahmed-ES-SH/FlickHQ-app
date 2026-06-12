@@ -18,6 +18,7 @@ import type {
   UpdatePlanDto,
   CreatePriceDto,
   PriceResponseDto,
+  CreateSubscriptionResponse,
 } from "@/app/types/subscriptions";
 
 // ────────────────────────────
@@ -767,6 +768,54 @@ export async function deactivateAdminPriceAction(
     success: true,
     message: res.message,
     data: res.data as PriceResponseDto,
+    statusCode: res.statusCode,
+  };
+}
+
+/**
+ * Create a subscription after a successful Elements payment.
+ * Called on the success page after confirmPayment redirects back.
+ * Sends the PaymentIntent ID and an Idempotency-Key.
+ * 409 (Idempotency-Key reused) is treated as success.
+ */
+export async function createSubscriptionAction(
+  paymentIntentId: string,
+  idempotencyKey?: string,
+): Promise<PlansActionResult<CreateSubscriptionResponse>> {
+  const res = await globalRequest({
+    endpoint: API_ENDPOINTS.SUBSCRIPTIONS.create,
+    method: "POST",
+    body: { paymentIntentId },
+    headers: idempotencyKey
+      ? { "Idempotency-Key": idempotencyKey }
+      : undefined,
+    defaultErrorMessage: "Failed to create subscription",
+  });
+
+  if (!res.success) {
+    if (res.statusCode === 409) {
+      return {
+        success: true,
+        message: "Subscription already exists",
+        data: res.data as CreateSubscriptionResponse,
+        statusCode: 200,
+      };
+    }
+    return {
+      success: false,
+      message: normalizeErrorMessage(
+        res.message,
+        "Failed to create subscription",
+      ),
+      statusCode: res.statusCode,
+      errors: res.errors,
+    };
+  }
+
+  return {
+    success: true,
+    message: res.message,
+    data: res.data as CreateSubscriptionResponse,
     statusCode: res.statusCode,
   };
 }

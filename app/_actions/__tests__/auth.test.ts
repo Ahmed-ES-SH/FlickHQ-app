@@ -109,7 +109,10 @@ describe("loginAction", () => {
       ),
     );
 
-    const res = await loginAction({ email: "user@example.com", password: "pw" });
+    const res = await loginAction({
+      email: "user@example.com",
+      password: "pw",
+    });
 
     expect(mockFetch).toHaveBeenCalledWith(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}${API_ENDPOINTS.AUTH.login}`,
@@ -219,7 +222,10 @@ describe("loginAction", () => {
       ),
     );
 
-    const res = await loginAction({ email: "user@example.com", password: "pw" });
+    const res = await loginAction({
+      email: "user@example.com",
+      password: "pw",
+    });
 
     expect(mockedSetAuthCookie).not.toHaveBeenCalled();
     expect(res.success).toBe(true);
@@ -239,7 +245,10 @@ describe("loginAction", () => {
       ),
     );
 
-    const res = await loginAction({ email: "user@example.com", password: "pw" });
+    const res = await loginAction({
+      email: "user@example.com",
+      password: "pw",
+    });
 
     expect(mockedSetAuthCookie).not.toHaveBeenCalled();
     expect(res.success).toBe(true);
@@ -259,9 +268,7 @@ describe("loginAction", () => {
   });
 
   it("falls back to 'Login failed' when error response has no message", async () => {
-    mockFetch.mockResolvedValueOnce(
-      createMockResponse({}, { status: 400 }),
-    );
+    mockFetch.mockResolvedValueOnce(createMockResponse({}, { status: 400 }));
 
     const res = await loginAction({ email: "x@x.com", password: "pw" });
     expect(res.success).toBe(false);
@@ -281,7 +288,10 @@ describe("loginAction", () => {
       ),
     );
 
-    const res = await loginAction({ email: "user@example.com", password: "pw" });
+    const res = await loginAction({
+      email: "user@example.com",
+      password: "pw",
+    });
     expect(res.success).toBe(true);
     expect(res.message).toBe("Logged in successfully");
   });
@@ -300,7 +310,10 @@ describe("loginAction", () => {
       ),
     );
 
-    const res = await loginAction({ email: "user@example.com", password: "pw" });
+    const res = await loginAction({
+      email: "user@example.com",
+      password: "pw",
+    });
     expect(mockedSetAuthCookie).toHaveBeenCalledWith("fallback-cookie");
     expect(res.success).toBe(true);
   });
@@ -718,6 +731,7 @@ describe("resendVerificationAction", () => {
   it("returns default error message when no message is provided", async () => {
     mockedGlobalRequest.mockResolvedValueOnce({
       success: false,
+      message: "",
     });
 
     const res = await resendVerificationAction("user@example.com");

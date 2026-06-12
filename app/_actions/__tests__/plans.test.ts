@@ -17,6 +17,7 @@ import {
   createEmbeddedCheckoutSessionAction,
   createOneTimeCheckoutAction,
   createPortalSessionAction,
+  createSubscriptionAction,
   ensureBillingCustomerAction,
   fetchAdminPlansAction,
   fetchAdminPlanDetailAction,
@@ -401,6 +402,93 @@ describe("createPortalSessionAction", () => {
     );
     expect(res.success).toBe(true);
     expect(res.data?.url).toBe("https://billing.stripe.com/");
+  });
+});
+
+describe("createSubscriptionAction", () => {
+  it("creates subscription with valid paymentIntentId", async () => {
+    mockedGlobalRequest.mockResolvedValueOnce({
+      success: true,
+      data: { subscriptionId: "sub_123", status: "active" },
+      statusCode: 200,
+      message: "ok",
+    });
+
+    const res = await createSubscriptionAction("pi_xxx", "idempotency-key-1");
+
+    expect(mockedGlobalRequest).toHaveBeenCalledWith({
+      endpoint: API_ENDPOINTS.SUBSCRIPTIONS.create,
+      method: "POST",
+      body: { paymentIntentId: "pi_xxx" },
+      headers: { "Idempotency-Key": "idempotency-key-1" },
+      defaultErrorMessage: "Failed to create subscription",
+    });
+    expect(res.success).toBe(true);
+    expect(res.data?.subscriptionId).toBe("sub_123");
+    expect(res.data?.status).toBe("active");
+  });
+
+  it("works without idempotency key", async () => {
+    mockedGlobalRequest.mockResolvedValueOnce({
+      success: true,
+      data: { subscriptionId: "sub_456", status: "trialing" },
+      statusCode: 200,
+      message: "ok",
+    });
+
+    const res = await createSubscriptionAction("pi_yyy");
+
+    expect(mockedGlobalRequest).toHaveBeenCalledWith({
+      endpoint: API_ENDPOINTS.SUBSCRIPTIONS.create,
+      method: "POST",
+      body: { paymentIntentId: "pi_yyy" },
+      headers: undefined,
+      defaultErrorMessage: "Failed to create subscription",
+    });
+    expect(res.success).toBe(true);
+  });
+
+  it("returns success on 409 (Idempotency-Key reused)", async () => {
+    mockedGlobalRequest.mockResolvedValueOnce({
+      success: false,
+      data: { subscriptionId: "sub_123", status: "active" },
+      statusCode: 409,
+      message: "Idempotency-Key already used",
+    });
+
+    const res = await createSubscriptionAction("pi_xxx", "reused-key");
+
+    expect(res.success).toBe(true);
+    expect(res.message).toBe("Subscription already exists");
+    expect(res.data?.subscriptionId).toBe("sub_123");
+  });
+
+  it("returns error on 4xx failure", async () => {
+    mockedGlobalRequest.mockResolvedValueOnce({
+      success: false,
+      message: "Payment intent not found",
+      statusCode: 400,
+    });
+
+    const res = await createSubscriptionAction("pi_bad");
+
+    expect(res.success).toBe(false);
+    expect(res.message).toBe("Payment intent not found");
+    expect(res.statusCode).toBe(400);
+  });
+
+  it("returns error when API call fails", async () => {
+    mockedGlobalRequest.mockResolvedValueOnce({
+      success: false,
+      message: "Internal server error",
+      statusCode: 500,
+    });
+
+    const res = await createSubscriptionAction("pi_fail");
+
+    expect(res.success).toBe(false);
+    expect(res.message).toBe("Internal server error");
+    expect(res.statusCode).toBe(500);
   });
 });
 

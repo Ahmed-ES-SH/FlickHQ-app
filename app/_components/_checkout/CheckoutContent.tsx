@@ -43,7 +43,7 @@ export default function CheckoutContent() {
     price: PriceResponseDto;
   } | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
   const idempotencyKeyRef = useRef<string | null>(null);
 
   // Generate a stable idempotency key for the session
@@ -112,7 +112,7 @@ export default function CheckoutContent() {
       }
 
       setClientSecret(sessionResult.data!.clientSecret);
-      setSessionId(sessionResult.data!.sessionId ?? null);
+      setPaymentIntentId(sessionResult.data!.paymentIntentId ?? null);
       setStatus("ready");
     } catch (err) {
       setError(
@@ -186,7 +186,7 @@ export default function CheckoutContent() {
                       appearance: flickhqStripeAppearance,
                     }}
                   >
-                    <CustomCheckoutForm sessionId={sessionId} />
+                    <CustomCheckoutForm paymentIntentId={paymentIntentId} />
                   </Elements>
                 ) : (
                   <ErrorState

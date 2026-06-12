@@ -353,7 +353,7 @@ export function SuccessErrorState({ message }: { message: string }) {
 // ─── Composite: SuccessStates ───────────────────────
 
 export interface SuccessStatesProps {
-  status: "polling" | "confirmed" | "pending" | "error";
+  status: "creating" | "polling" | "confirmed" | "pending" | "error";
   subscription: UserSubscriptionHistoryItemDto | null;
   message: string;
 }
@@ -367,6 +367,8 @@ export function SuccessStates({
   message,
 }: SuccessStatesProps) {
   switch (status) {
+    case "creating":
+      return <PollingState message={message} />;
     case "polling":
       return <PollingState message={message} />;
     case "confirmed":

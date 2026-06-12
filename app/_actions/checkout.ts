@@ -14,6 +14,7 @@ import type { PlansActionResult } from "@/app/types/subscriptions";
 export interface ElementsCheckoutResponse {
   sessionId?: string;
   clientSecret: string;
+  paymentIntentId?: string;
 }
 
 // ─── Server Action ──────────────────────────────────
@@ -97,6 +98,7 @@ export async function createElementsCheckoutSessionAction(
     data: {
       clientSecret,
       sessionId: (rawData.sessionId ?? rawData.session_id ?? rawData.id) as string | undefined,
+      paymentIntentId: (rawData.paymentIntentId ?? rawData.payment_intent_id) as string | undefined,
     },
     statusCode: res.statusCode,
   };

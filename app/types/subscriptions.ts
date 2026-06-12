@@ -220,6 +220,11 @@ export interface CurrentUserResponseDto {
 
 // ────────────────────────────
 
+export interface CreateSubscriptionResponse {
+  subscriptionId: string;
+  status: string;
+}
+
 export interface CreatePlanDto {
   code: string;
   name: string;

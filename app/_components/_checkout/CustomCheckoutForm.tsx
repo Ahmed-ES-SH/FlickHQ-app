@@ -27,12 +27,12 @@ import { LuLock, LuShield } from "react-icons/lu";
 // ─── Props ──────────────────────────────────────────
 
 interface CustomCheckoutFormProps {
-  sessionId?: string | null;
+  paymentIntentId?: string | null;
 }
 
 // ─── Component ──────────────────────────────────────
 
-export function CustomCheckoutForm({ sessionId }: CustomCheckoutFormProps) {
+export function CustomCheckoutForm({ paymentIntentId }: CustomCheckoutFormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const router = useRouter();
@@ -51,11 +51,10 @@ export function CustomCheckoutForm({ sessionId }: CustomCheckoutFormProps) {
       setIsSubmitting(true);
       setError(null);
 
-      // Persist sessionId to sessionStorage so the success page can read it
-      // (Stripe strips custom query params on redirect)
-      if (sessionId) {
+      // Persist paymentIntentId to sessionStorage so the success page can read it
+      if (paymentIntentId) {
         try {
-          sessionStorage.setItem("checkout_session_id", sessionId);
+          sessionStorage.setItem("checkout_payment_intent_id", paymentIntentId);
         } catch { /* sessionStorage unavailable */ }
       }
 
@@ -75,7 +74,7 @@ export function CustomCheckoutForm({ sessionId }: CustomCheckoutFormProps) {
       // On success, Stripe redirects to return_url
       // No need to handle success state here
     },
-    [stripe, elements, sessionId],
+    [stripe, elements, paymentIntentId],
   );
 
   // ── Determine button state ──────────────────────

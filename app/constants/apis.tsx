@@ -46,6 +46,7 @@ export const API_ENDPOINTS = {
     current: "/api/subscriptions/current",
     history: "/api/subscriptions/history",
     historyDetail: (id: string) => `/api/subscriptions/history/${id}`,
+    create: "/api/billing/subscriptions/create",
   },
   PAYMENTS: {
     history: "/api/payments/history",
