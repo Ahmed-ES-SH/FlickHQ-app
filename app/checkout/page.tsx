@@ -16,6 +16,8 @@ export function generateMetadata(): Metadata {
   return getSharedMetadata(title, description);
 }
 
+export const dynamic = "force-dynamic";
+
 export default function CheckoutPage() {
   return (
     <Suspense
