@@ -3,14 +3,14 @@ import React, { useMemo, useState } from "react";
 import { FaEnvelope } from "react-icons/fa6";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { VscLoading } from "react-icons/vsc";
-
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import OtherMethods from "./OtherMethods";
 import { loginAction } from "@/app/_actions/auth";
 import { useAuthStore } from "@/app/_stores/authStore";
+
+import Link from "next/link";
+import OtherMethods from "./OtherMethods";
 import Input from "./_form/Input";
 
 export default function SigninForm() {
@@ -161,7 +161,7 @@ export default function SigninForm() {
           className="relative bg-accent hover:bg-[#ff0a16] text-white px-6 py-3 sm:py-4 w-full rounded-xl font-bold uppercase tracking-wider flex items-center justify-center gap-2 duration-300 shadow-lg shadow-accent/20 overflow-hidden group/btn disabled:opacity-70 disabled:cursor-not-allowed"
         >
           {/* Shimmer Effect */}
-          <div className="absolute inset-0 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-1000 bg-linear-to-r from-transparent via-white/20 to-transparent" />
+          <div className="absolute inset-0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000 bg-linear-to-r from-transparent via-white/20 to-transparent" />
 
           {isSubmitting ? (
             <motion.div
@@ -178,9 +178,9 @@ export default function SigninForm() {
 
       {/* other methods*/}
       <div className="w-full my-4 sm:my-5 flex items-center gap-4 text-gray-500 text-xs uppercase tracking-widest font-bold">
-        <div className="h-[1px] flex-1 bg-white/10"></div>
+        <div className="h-px flex-1 bg-white/10"></div>
         <span>or connect with</span>
-        <div className="h-[1px] flex-1 bg-white/10"></div>
+        <div className="h-px flex-1 bg-white/10"></div>
       </div>
 
       <OtherMethods />

@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaEye, FaHeart, FaList, FaUser } from "react-icons/fa";
 import { MdLogout } from "react-icons/md";
-import { PiSignIn } from "react-icons/pi";
+import { LuLogIn } from "react-icons/lu";
 import { toast } from "sonner";
 import { useAuthStore } from "@/app/_stores/authStore";
 import { logoutAction } from "@/app/_actions/auth";
@@ -85,7 +85,7 @@ export default function UserButton() {
         className="touch-target flex items-center gap-2 bg-accent px-5 py-2 rounded-md text-white text-sm font-medium hover:bg-accent/90 transition-colors duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
         aria-label="Sign in to your account"
       >
-        <PiSignIn className="w-4 h-4" aria-hidden="true" />
+        <LuLogIn className="w-4 h-4" aria-hidden="true" />
         <span className="max-sm:hidden whitespace-nowrap">Sign in</span>
       </Link>
     );

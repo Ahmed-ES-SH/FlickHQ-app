@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import React from "react";
-import { PiSignIn, PiSignOut } from "react-icons/pi";
+import { LuLogIn, LuLogOut } from "react-icons/lu";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useAuthStore } from "@/app/_stores/authStore";
@@ -48,7 +48,7 @@ export default function Signinbtn() {
           className="p-2 text-gray-400 hover:text-accent duration-300 transition-colors"
           title="Logout"
         >
-          <PiSignOut className="w-5 h-5" />
+          <LuLogOut className="w-5 h-5" />
         </button>
       </div>
     );
@@ -60,7 +60,7 @@ export default function Signinbtn() {
       className="flex items-center gap-2 bg-accent px-5 py-2 rounded-md text-white text-sm font-medium hover:bg-accent/90 transition-colors active:scale-[0.98]"
       aria-label="Go to sign in page"
     >
-      <PiSignIn className="w-4 h-4" />
+      <LuLogIn className="w-4 h-4" />
       <span className="max-sm:hidden whitespace-nowrap">Sign in</span>
     </Link>
   );
